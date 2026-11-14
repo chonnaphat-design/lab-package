@@ -1,0 +1,31 @@
+@reference "../../styles/reference.css";
+
+/* Keep Tailwind's layer order even if this file loads before globals.css. */
+@layer theme, base, components, utilities;
+
+@layer components {
+  .root {
+    @apply h-9 w-full min-w-0 rounded-4xl border border-input bg-input/30 px-3 py-1 text-base transition-colors outline-none md:text-sm;
+    @apply file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground;
+    @apply placeholder:text-muted-foreground;
+    @apply focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50;
+    @apply disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50;
+    @apply aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20;
+  }
+
+  :global(.dark) .root[aria-invalid="true"] {
+    @apply border-destructive/50 ring-destructive/40;
+  }
+
+  /*
+   * Embedded in an InputGroup: the group draws the border, background and
+   * focus/invalid ring, so the input itself is chrome-less. Selectors are
+   * listed per state so they outrank every rule above.
+   */
+  .root[data-slot="input-group-control"],
+  .root[data-slot="input-group-control"]:focus-visible,
+  .root[data-slot="input-group-control"][aria-invalid="true"],
+  :global(.dark) .root[data-slot="input-group-control"][aria-invalid="true"] {
+    @apply flex-1 rounded-none border-0 bg-transparent shadow-none ring-0;
+  }
+}

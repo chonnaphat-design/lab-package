@@ -1,0 +1,87 @@
+@reference "../../styles/reference.css";
+
+/* Keep Tailwind's layer order even if this file loads before globals.css. */
+@layer theme, base, components, utilities;
+
+@layer components {
+  /* ---- group (the visible field chrome) ---- */
+
+  .root {
+    @apply relative flex h-9 w-full min-w-0 items-center rounded-4xl border border-input bg-input/30 transition-colors outline-none;
+    /* focus ring follows the inner control */
+    @apply has-[[data-slot=input-group-control]:focus-visible]:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-[3px] has-[[data-slot=input-group-control]:focus-visible]:ring-ring/50;
+    /* invalid when any slotted child is aria-invalid */
+    @apply has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:ring-[3px] has-[[data-slot][aria-invalid=true]]:ring-destructive/20;
+    /* inside a combobox popup the popup owns the focus style */
+    @apply in-data-[slot=combobox-content]:focus-within:border-inherit in-data-[slot=combobox-content]:focus-within:ring-0;
+    /* textarea and block addons grow the group vertically */
+    @apply has-[textarea]:rounded-xl has-[>textarea]:h-auto;
+    @apply has-data-[align=block-end]:rounded-2xl has-data-[align=block-start]:rounded-2xl;
+    @apply has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col;
+    /* make room next to addons */
+    @apply has-[>[data-align=block-end]]:[&>input]:pt-3 has-[>[data-align=block-start]]:[&>input]:pb-3;
+    @apply has-[>[data-align=inline-end]]:[&>input]:pr-1.5 has-[>[data-align=inline-start]]:[&>input]:pl-1.5;
+  }
+
+  :global(.dark) .root:has([data-slot][aria-invalid="true"]) {
+    @apply ring-destructive/40;
+  }
+
+  /* ---- addon ---- */
+
+  .addon {
+    @apply flex h-auto cursor-text items-center justify-center gap-2 py-2 text-sm font-medium text-muted-foreground select-none;
+    @apply **:data-[slot=kbd]:rounded-4xl **:data-[slot=kbd]:bg-muted-foreground/10 **:data-[slot=kbd]:px-1.5;
+    @apply [&>svg:not([class*='size-'])]:size-4;
+  }
+
+  .root[data-disabled="true"] .addon {
+    @apply opacity-50;
+  }
+
+  .addon[data-align="inline-start"] {
+    @apply order-first pl-3 has-[>button]:-ml-1 has-[>kbd]:ml-[-0.15rem];
+  }
+
+  .addon[data-align="inline-end"] {
+    @apply order-last pr-3 has-[>button]:-mr-1 has-[>kbd]:mr-[-0.15rem];
+  }
+
+  .addon[data-align="block-start"] {
+    @apply order-first w-full justify-start px-3 pt-3;
+  }
+  /* a divider under a top addon gets matching padding */
+  .addon[data-align="block-start"]:global(.border-b) {
+    @apply pb-3;
+  }
+
+  .addon[data-align="block-end"] {
+    @apply order-last w-full justify-start px-3 pb-3;
+  }
+  .addon[data-align="block-end"]:global(.border-t) {
+    @apply pt-3;
+  }
+
+  /* ---- button (scoped under .root so it outranks Button's own sizes) ---- */
+
+  .root .button[data-slot="button"] {
+    @apply flex items-center gap-2 rounded-4xl text-sm shadow-none;
+  }
+
+  .root .button[data-slot="button"][data-size="xs"]:not([data-icon-only]) {
+    @apply h-6 gap-1 px-1.5;
+  }
+  .root .button[data-size="xs"] > svg:not([class*="size-"]) {
+    @apply size-3.5;
+  }
+
+  .root .button[data-icon-only] {
+    @apply p-0;
+  }
+
+  /* ---- inline text ---- */
+
+  .text {
+    @apply flex items-center gap-2 text-sm text-muted-foreground [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4;
+  }
+}

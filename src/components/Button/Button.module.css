@@ -1,0 +1,89 @@
+@reference "../../styles/reference.css";
+
+/* Keep Tailwind's layer order even if this file loads before globals.css. */
+@layer theme, base, components, utilities;
+
+@layer components {
+  .root {
+    @apply inline-flex shrink-0 items-center justify-center rounded-4xl border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none;
+    @apply focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50;
+    @apply active:not-aria-[haspopup]:translate-y-px;
+    @apply disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50;
+    @apply aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20;
+    @apply [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4;
+  }
+
+  :global(.dark) .root[aria-invalid="true"] {
+    @apply border-destructive/50 ring-destructive/40;
+  }
+
+  /* ---- variant ---- */
+
+  .root[data-variant="primary"] {
+    @apply bg-primary text-primary-foreground hover:bg-primary/80;
+  }
+  /* Fading to 80% shows the dark page through (2.96:1). Lighten instead (4.95:1). */
+  :global(.dark) .root[data-variant="primary"] {
+    @apply hover:bg-[color-mix(in_oklab,var(--primary),var(--foreground)_15%)];
+  }
+
+  .root[data-variant="secondary"] {
+    @apply bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground;
+  }
+
+  .root[data-variant="outline"] {
+    @apply border-border bg-input/30 hover:bg-input/50 hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground;
+  }
+
+  .root[data-variant="ghost"] {
+    @apply hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground;
+  }
+  :global(.dark) .root[data-variant="ghost"] {
+    @apply hover:bg-muted/50;
+  }
+
+  .root[data-variant="danger"] {
+    @apply bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20;
+  }
+  /* Hover tint capped at /25: /30 drops danger text to 4.30:1 (now 4.74:1). */
+  :global(.dark) .root[data-variant="danger"] {
+    @apply bg-destructive/20 hover:bg-destructive/25 focus-visible:ring-destructive/40;
+  }
+
+  .root[data-variant="link"] {
+    @apply text-link underline-offset-4 hover:underline;
+  }
+
+  /* ---- size ---- */
+
+  .root[data-size="xs"] {
+    @apply h-6 gap-1 px-2.5 text-xs has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3;
+  }
+
+  .root[data-size="sm"] {
+    @apply h-8 gap-1 px-3 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2;
+  }
+
+  .root[data-size="md"] {
+    @apply h-9 gap-1.5 px-3 has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5;
+  }
+
+  .root[data-size="lg"] {
+    @apply h-10 gap-1.5 px-4 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3;
+  }
+
+  /* ---- icon-only (square) ---- */
+
+  .root[data-icon-only][data-size="xs"] {
+    @apply size-6 p-0;
+  }
+  .root[data-icon-only][data-size="sm"] {
+    @apply size-8 p-0;
+  }
+  .root[data-icon-only][data-size="md"] {
+    @apply size-9 p-0;
+  }
+  .root[data-icon-only][data-size="lg"] {
+    @apply size-10 p-0;
+  }
+}
