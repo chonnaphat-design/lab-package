@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { ArrowRightIcon, CopyIcon, PlusIcon } from "lucide-react"
 import { fn } from "storybook/test"
 
-import { Button, type ButtonSize, type ButtonVariant } from "lab-package"
+import { Button, type ButtonSize, type ButtonVariant } from "./Button"
 
 const variants: ButtonVariant[] = [
   "primary",
@@ -114,32 +114,17 @@ type StateColumn = {
 
 const states: StateColumn[] = [
   { name: "default" },
-  { name: "hover" },
-  { name: "focus-visible" },
-  { name: "active" },
   { name: "disabled", props: { disabled: true } },
   { name: "invalid", props: { "aria-invalid": true } },
   { name: "expanded", props: { "aria-expanded": true } },
 ]
 
-const cellId = (variant: string, state: string) => `button-${variant}-${state}`
-const pseudoTargets = (state: string) =>
-  variants.map((variant) => `#${cellId(variant, state)}`)
-
 /**
- * Every variant in every state. Hover, focus-visible and active are forced by
- * the pseudo-states addon; disabled, invalid and expanded use real props.
- * Switch the theme in the toolbar to check dark.
+ * Every variant in every prop-driven state. Hover, focus-visible and active
+ * need a real pointer or keyboard: try them on the buttons here.
  */
 export const StateMatrix: Story = {
-  parameters: {
-    layout: "padded",
-    pseudo: {
-      hover: pseudoTargets("hover"),
-      focusVisible: pseudoTargets("focus-visible"),
-      active: pseudoTargets("active"),
-    },
-  },
+  parameters: { layout: "padded" },
   render: (args) => (
     <table className="border-separate border-spacing-x-4 border-spacing-y-3 text-sm">
       <thead>
@@ -170,7 +155,6 @@ export const StateMatrix: Story = {
                 <Button
                   {...args}
                   {...state.props}
-                  id={cellId(variant, state.name)}
                   variant={variant}
                 >
                   Button
@@ -181,6 +165,19 @@ export const StateMatrix: Story = {
         ))}
       </tbody>
     </table>
+  ),
+}
+
+/** The same variants under `.dark`, the class a theme switcher sets on an ancestor. */
+export const Dark: Story = {
+  render: (args) => (
+    <div className="dark flex flex-wrap items-center gap-3 rounded-2xl bg-background p-6 text-foreground">
+      {variants.map((variant) => (
+        <Button key={variant} {...args} variant={variant}>
+          {variant}
+        </Button>
+      ))}
+    </div>
   ),
 }
 

@@ -15,7 +15,14 @@ const external = [
 external.push(/^react\/jsx-runtime$/)
 
 export default defineConfig({
-  plugins: [dts({ include: ["src"], entryRoot: "src" })],
+  plugins: [
+    dts({
+      include: ["src"],
+      // Stories sit beside components but are not part of the package.
+      exclude: ["src/**/*.stories.tsx"],
+      entryRoot: "src",
+    }),
+  ],
   css: {
     modules: {
       // Stable, readable prefix so library classes are recognisable in a consumer's DOM.

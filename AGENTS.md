@@ -4,42 +4,47 @@
 
 The components were built and reviewed in the week-1-lab app and copied here. The two copies are independent, so a change in one is not reflected in the other. Test, lint and release tooling are not decided yet. Add them only when asked.
 
+## Repo layout
+
+An npm workspace. Run every command from the repo root.
+
+- `packages/ui/`: the published library, npm name `lab-package`. Its `package.json`, `vite.config.ts` and `README.md` (the npm page) live here.
+- `apps/storybook/`: private Storybook 10 workspace (`@lab-package/storybook`) for checking props and states. It holds config only. Stories live beside the components.
+- Root `package.json`: private (`lab-package-workspace`). It holds the `workspaces` list and the `storybook` / `build-storybook` scripts.
+
 ## Commands
 
 `package.json` scripts are the source of truth:
 
 ```bash
-npm install
-npm run build        # vite build → dist/
-npm run typecheck    # tsc --noEmit
-npm run pack:check   # npm pack --dry-run: the exact publish file list
-
-npm run storybook -w @lab-package/storybook         # dev server, http://localhost:6006
-npm run build-storybook -w @lab-package/storybook   # static build → apps/storybook/storybook-static
-npm run typecheck -w @lab-package/storybook         # stories + .storybook config
+npm install                            # all workspaces
+npm run build -w lab-package           # vite build → packages/ui/dist/
+npm run typecheck -w lab-package       # tsc --noEmit (components and stories)
+npm run pack:check -w lab-package      # npm pack --dry-run: the exact publish file list
+npm run storybook                      # dev server, http://localhost:6006
+npm run build-storybook                # static build → apps/storybook/storybook-static
+npm run typecheck -w @lab-package/storybook   # .storybook/main.ts + preview.ts
 ```
 
-The root is also an npm workspace root (`"workspaces": ["apps/*"]`), so run `npm install` once at the root. `files: ["dist"]` keeps `apps/` out of the published tarball.
-
-To try the package in a real app, run `npm pack` and install the `.tgz` there. Avoid `npm link`: it resolves a second copy of React and breaks hooks with "Invalid hook call".
+To try the package in a real app, run `npm pack -w lab-package` and install the `.tgz` there. Avoid `npm link`: it resolves a second copy of React and breaks hooks with "Invalid hook call".
 
 ## How the build works
 
-- **Vite 8 library mode** (Rolldown) with `vite-plugin-dts` produces ESM only, `.d.ts` files and source maps. Vite was chosen over tsup because it compiles CSS Modules and Tailwind `@apply` in one pass.
+Paths below are relative to `packages/ui/`.
+
+- **Vite 8 library mode** (Rolldown) with `vite-plugin-dts` produces ESM only, `.d.ts` files and source maps. Vite was chosen over tsup because it compiles CSS Modules and Tailwind `@apply` in one pass. The dts step excludes `*.stories.tsx`.
 - **`preserveModules`** emits one file per source module, so each component keeps its own `"use client"`. Rolldown prints `MODULE_LEVEL_DIRECTIVE` warnings for these, which is expected.
 - **All CSS goes into one `dist/styles.css`** (`cssCodeSplit: false`), exported as `lab-package/styles.css`. The import of `tokens.css` in `src/index.ts` is what puts the tokens in that file. The JS output carries no CSS import, so consumers import the stylesheet themselves.
 - **Externals** come from `dependencies` + `peerDependencies` in `package.json`. A new runtime dependency is externalised automatically once it is listed there.
-- Tailwind runs **only at build time**. Utilities used via `@apply` compile with fallbacks (`var(--spacing,.25rem)`), so consumers need no Tailwind `@source` pointing at this package.
+- Tailwind runs **only at build time**, through `postcss.config.mjs`. Utilities used via `@apply` compile with fallbacks (`var(--spacing,.25rem)`), so consumers need no Tailwind `@source` pointing at this package.
 
-## Layout
+## Library layout (`packages/ui/src`)
 
-- `src/components/<Name>/`: `<Name>.tsx` (markup and behavior), `<Name>.module.css` (all styles), `index.ts` (component + prop types). Button also has a `README.md`, which is the model component doc.
-- `src/index.ts`: the public barrel. A component is public only after it is exported here.
-- `src/lib/utils.ts`: `cn`, re-exported from the `cn` npm package (shadcn's clsx + tailwind-merge replacement).
-- `src/styles/tokens.css` (**shipped**): `:root` (light) and `.dark` variables, plus the global `border-color` / `outline-color` base rule that components rely on. Keep light and dark values in sync.
-- `src/styles/reference.css` (**build-only**): Tailwind, `tw-animate-css`, `shadcn/tailwind.css` (the `data-open:` / `data-closed:` variants) and the `@theme inline` mapping from `--color-*` to the tokens. Every module `@reference`s it, and it emits nothing. A new token goes in both files: its value in `tokens.css`, its `--color-*` mapping in `reference.css`.
-
-- `apps/storybook/`: private Storybook workspace (`@lab-package/storybook`) for checking each component's props and states. See [Storybook](#storybook).
+- `components/<Name>/`: `<Name>.tsx` (markup and behavior), `<Name>.module.css` (all styles), `index.ts` (component + prop types), `<Name>.stories.tsx` (Storybook). Button also has a `README.md`, which is the model component doc.
+- `index.ts`: the public barrel. A component is public only after it is exported here.
+- `lib/utils.ts`: `cn`, re-exported from the `cn` npm package (shadcn's clsx + tailwind-merge replacement).
+- `styles/tokens.css` (**shipped**): `:root` (light) and `.dark` variables, plus the global `border-color` / `outline-color` base rule that components rely on. Keep light and dark values in sync.
+- `styles/reference.css` (**not shipped**): Tailwind, `tw-animate-css`, `shadcn/tailwind.css` (the `data-open:` / `data-closed:` variants) and the `@theme inline` mapping from `--color-*` to the tokens. Every module `@reference`s it, and Storybook's preview imports it. A new token goes in both files: its value in `tokens.css`, its `--color-*` mapping in `reference.css`.
 
 ## Component anatomy
 
@@ -67,16 +72,15 @@ To try the package in a real app, run `npm pack` and install the `.tgz` there. A
 
 ## Storybook
 
-- **Stories import `lab-package` from source:** an alias in `.storybook/main.ts` (`viteFinal`) plus `paths` in `apps/storybook/tsconfig.json` point it at `src/index.ts`, so component edits hot-reload without rebuilding `dist/`. Keep the alias and the `paths` entry in sync.
-- **`.storybook/preview.css` plays the consumer.** It provides the Tailwind v4 reset, the fonts (Inter body, Outfit as `--font-heading`, via `@fontsource-variable`) and page colors, and `@source`s the stories so `className` overrides used in them get generated. The package's tokens and component CSS arrive through the import itself.
-- **Theme toolbar** (`@storybook/addon-themes`) toggles `.dark` on `<html>`. To open a story in dark directly, add `&globals=theme:dark` to its URL.
-- **Interactive states:** `storybook-addon-pseudo-states` forces `hover` / `focusVisible` / `active` on elements listed in a story's `parameters.pseudo`, by `id` (see `StateMatrix` in `Button.stories.tsx`). Disabled, invalid and expanded states use real props.
-- **a11y:** `@storybook/addon-a11y` runs axe on each story, and `parameters.a11y.test = "error"` makes violations fail. Write stories as correct real usage, e.g. `aria-label` on `iconOnly` buttons.
-- **One `<Name>.stories.tsx` per component** in `apps/storybook/stories/`, titled `Components/<Name>`, tagged `autodocs`. `Button.stories.tsx` is the model: a `Playground` with a control for every prop, then one story per prop axis (variants, sizes, icons), a `StateMatrix` (variants × states), `render` usage, and a `className` override.
+- **Stories sit beside their component:** `packages/ui/src/components/<Name>/<Name>.stories.tsx`, matched by `stories` in `apps/storybook/.storybook/main.ts`. They import the component relatively (`./Button`), so edits hot-reload without rebuilding `dist/`.
+- **Tailwind runs through `@tailwindcss/vite`**, added in `main.ts` `viteFinal`. It compiles both the preview stylesheet and the components' CSS Modules.
+- **`.storybook/preview.ts` imports `preview.css`**, which plays the consumer. It imports the library's `reference.css` (Tailwind reset + `--color-*` mapping, so story utilities like `text-muted-foreground` work) and `tokens.css`, `@source`s `packages/ui/src` so `className` overrides in stories get generated, and sets page colors.
+- **No addons** (initialised with `--no-features`). Dark mode is checked with a story that wraps components in `<div className="dark …">`. Hover, focus-visible and active are checked by hand.
+- **One `<Name>.stories.tsx` per component**, titled `Components/<Name>`, tagged `autodocs`. `Button.stories.tsx` is the model: a `Playground` with a control for every prop, then one story per prop axis (variants, sizes, icons), a `StateMatrix` (variants × prop-driven states), `Dark`, `render` usage, and a `className` override. Write stories as correct real usage, e.g. `aria-label` on `iconOnly` buttons.
 
 ## Consumer contract
 
-The README documents this for users. Keep the two in step.
+`packages/ui/README.md` documents this for users. Keep the two in step.
 
 - The consumer imports `lab-package/styles.css` once.
 - The consumer provides a CSS reset (Tailwind v4 preflight), `.dark` on an ancestor for dark mode, and `--font-heading` (used by `DialogTitle`).
@@ -85,12 +89,12 @@ The README documents this for users. Keep the two in step.
 
 ## Checks after a change
 
-Run `typecheck`, `build`, then `pack:check`, plus the Storybook `typecheck` and `build-storybook` when a component or its stories changed. Then confirm against `dist/`:
+Run the library's `typecheck`, `build` and `pack:check`, plus `build-storybook` when a component or its stories changed. Then confirm against `packages/ui/dist/`:
 
 - Each component whose source starts with `"use client"` (currently Dialog, InputGroup, InputOTP) still starts with it in `dist/components/<Name>/<Name>.js`.
-- `grep -r "@/" dist` returns nothing.
+- `grep -r "@/" dist` returns nothing, and no `*.stories.*` file is in `dist/`.
 - The pack file list contains only `dist/**`, `README.md` and `package.json`.
 
 ## Publishing
 
-Publishing is the maintainer's call (planned for Week 4). Agents get the release ready and stop at `npm run pack:check`.
+Publishing is the maintainer's call (planned for Week 4). Agents get the release ready and stop at `npm run pack:check -w lab-package`.
