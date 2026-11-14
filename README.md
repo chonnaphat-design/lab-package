@@ -49,6 +49,8 @@ npm install
 npm run build       # vite build → dist/ (ESM, .d.ts, styles.css)
 npm run typecheck   # tsc --noEmit
 npm run pack:check  # npm pack --dry-run: lists exactly what would publish
+
+npm run storybook -w @lab-package/storybook   # component props and states, http://localhost:6006
 ```
 
 How the build works and the rules for changing components are in [AGENTS.md](AGENTS.md).

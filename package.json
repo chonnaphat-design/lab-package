@@ -17,6 +17,9 @@
   "files": [
     "dist"
   ],
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "build": "vite build",
     "typecheck": "tsc --noEmit",

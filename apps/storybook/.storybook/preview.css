@@ -1,0 +1,27 @@
+/*
+ * What a consuming app provides (see the package README, "The stylesheet"):
+ * a Tailwind v4 reset, fonts, and page colors. The package's own tokens and
+ * component styles arrive through `import "lab-package"` (src/index.ts).
+ */
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/outfit";
+
+/* Scan stories so className overrides used in them get generated. */
+@source "../stories";
+
+:root {
+  /* Same families as the week-1-lab app (Inter body, Outfit headings). */
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Outfit Variable", var(--font-sans);
+}
+
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}

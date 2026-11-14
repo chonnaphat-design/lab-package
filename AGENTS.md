@@ -13,7 +13,13 @@ npm install
 npm run build        # vite build → dist/
 npm run typecheck    # tsc --noEmit
 npm run pack:check   # npm pack --dry-run: the exact publish file list
+
+npm run storybook -w @lab-package/storybook         # dev server, http://localhost:6006
+npm run build-storybook -w @lab-package/storybook   # static build → apps/storybook/storybook-static
+npm run typecheck -w @lab-package/storybook         # stories + .storybook config
 ```
+
+The root is also an npm workspace root (`"workspaces": ["apps/*"]`), so run `npm install` once at the root. `files: ["dist"]` keeps `apps/` out of the published tarball.
 
 To try the package in a real app, run `npm pack` and install the `.tgz` there. Avoid `npm link`: it resolves a second copy of React and breaks hooks with "Invalid hook call".
 
@@ -32,6 +38,8 @@ To try the package in a real app, run `npm pack` and install the `.tgz` there. A
 - `src/lib/utils.ts`: `cn`, re-exported from the `cn` npm package (shadcn's clsx + tailwind-merge replacement).
 - `src/styles/tokens.css` (**shipped**): `:root` (light) and `.dark` variables, plus the global `border-color` / `outline-color` base rule that components rely on. Keep light and dark values in sync.
 - `src/styles/reference.css` (**build-only**): Tailwind, `tw-animate-css`, `shadcn/tailwind.css` (the `data-open:` / `data-closed:` variants) and the `@theme inline` mapping from `--color-*` to the tokens. Every module `@reference`s it, and it emits nothing. A new token goes in both files: its value in `tokens.css`, its `--color-*` mapping in `reference.css`.
+
+- `apps/storybook/`: private Storybook workspace (`@lab-package/storybook`) for checking each component's props and states. See [Storybook](#storybook).
 
 ## Component anatomy
 
@@ -57,6 +65,15 @@ To try the package in a real app, run `npm pack` and install the `.tgz` there. A
 - **Containers:** use an unnamed `@container`. CSS custom properties are not renamed.
 - **Restyling an embedded component** (InputGroup → Button/Input): scope under the parent (`.root .button[data-slot="button"]`) or key the state on `data-slot` in the child's own module, so the result does not depend on CSS load order.
 
+## Storybook
+
+- **Stories import `lab-package` from source:** an alias in `.storybook/main.ts` (`viteFinal`) plus `paths` in `apps/storybook/tsconfig.json` point it at `src/index.ts`, so component edits hot-reload without rebuilding `dist/`. Keep the alias and the `paths` entry in sync.
+- **`.storybook/preview.css` plays the consumer.** It provides the Tailwind v4 reset, the fonts (Inter body, Outfit as `--font-heading`, via `@fontsource-variable`) and page colors, and `@source`s the stories so `className` overrides used in them get generated. The package's tokens and component CSS arrive through the import itself.
+- **Theme toolbar** (`@storybook/addon-themes`) toggles `.dark` on `<html>`. To open a story in dark directly, add `&globals=theme:dark` to its URL.
+- **Interactive states:** `storybook-addon-pseudo-states` forces `hover` / `focusVisible` / `active` on elements listed in a story's `parameters.pseudo`, by `id` (see `StateMatrix` in `Button.stories.tsx`). Disabled, invalid and expanded states use real props.
+- **a11y:** `@storybook/addon-a11y` runs axe on each story, and `parameters.a11y.test = "error"` makes violations fail. Write stories as correct real usage, e.g. `aria-label` on `iconOnly` buttons.
+- **One `<Name>.stories.tsx` per component** in `apps/storybook/stories/`, titled `Components/<Name>`, tagged `autodocs`. `Button.stories.tsx` is the model: a `Playground` with a control for every prop, then one story per prop axis (variants, sizes, icons), a `StateMatrix` (variants × states), `render` usage, and a `className` override.
+
 ## Consumer contract
 
 The README documents this for users. Keep the two in step.
@@ -68,7 +85,7 @@ The README documents this for users. Keep the two in step.
 
 ## Checks after a change
 
-Run `typecheck`, `build`, then `pack:check`. Then confirm against `dist/`:
+Run `typecheck`, `build`, then `pack:check`, plus the Storybook `typecheck` and `build-storybook` when a component or its stories changed. Then confirm against `dist/`:
 
 - Each component whose source starts with `"use client"` (currently Dialog, InputGroup, InputOTP) still starts with it in `dist/components/<Name>/<Name>.js`.
 - `grep -r "@/" dist` returns nothing.
