@@ -40,6 +40,10 @@
   .root[data-variant="outline"] {
     @apply border-border bg-input/30 text-foreground [a]:hover:bg-muted [a]:hover:text-muted-foreground;
   }
+  /* The rule above has the same specificity as .root's aria-invalid border and comes later, so restate it. */
+  .root[data-variant="outline"][aria-invalid="true"] {
+    @apply border-destructive;
+  }
 
   .root[data-variant="ghost"] {
     @apply hover:bg-muted hover:text-muted-foreground;

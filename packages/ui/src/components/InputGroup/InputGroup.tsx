@@ -20,6 +20,9 @@ function InputGroup({ className, disabled, ...props }: InputGroupProps) {
       data-slot="input-group"
       role="group"
       data-disabled={disabled || undefined}
+      // Marks the whole group inactive, so its dimmed addon text falls under
+      // WCAG 1.4.3's exception for inactive components.
+      aria-disabled={disabled || undefined}
       className={cn(styles.root, className)}
       {...props}
     />

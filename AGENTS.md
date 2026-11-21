@@ -40,11 +40,17 @@ Paths below are relative to `packages/ui/`.
 
 ## Library layout (`packages/ui/src`)
 
-- `components/<Name>/`: `<Name>.tsx` (markup and behavior), `<Name>.module.css` (all styles), `index.ts` (component + prop types), `<Name>.stories.tsx` (Storybook). Button also has a `README.md`, which is the model component doc.
+- `components/<Name>/`: `<Name>.tsx` (markup and behavior), `<Name>.module.css` (all styles), `index.ts` (component + prop types), `<Name>.stories.tsx` (Storybook), `<Name>.md` (usage doc, see [Component docs](#component-docs)). Button also has a `README.md` with implementation notes for maintainers.
 - `index.ts`: the public barrel. A component is public only after it is exported here.
 - `lib/utils.ts`: `cn`, re-exported from the `cn` npm package (shadcn's clsx + tailwind-merge replacement).
 - `styles/tokens.css` (**shipped**): `:root` (light) and `.dark` variables, plus the global `border-color` / `outline-color` base rule that components rely on. Keep light and dark values in sync.
 - `styles/reference.css` (**not shipped**): Tailwind, `tw-animate-css`, `shadcn/tailwind.css` (the `data-open:` / `data-closed:` variants) and the `@theme inline` mapping from `--color-*` to the tokens. Every module `@reference`s it, and Storybook's preview imports it. A new token goes in both files: its value in `tokens.css`, its `--color-*` mapping in `reference.css`.
+
+## Component docs
+
+Before building or reviewing UI, read the `<Name>.md` doc beside each component you use, in `packages/ui/src/components/<Name>/`. Use only the props, variants and tokens listed there. If something you need is not documented, stop and ask.
+
+When you add or change a component, write or update its `<Name>.md` in the same change, matching `Dialog.md`: Purpose (one line), When to use, When not to use, Props and variants, Tokens used, and one example taken from the stories. Write it for designers and agents building UI, so leave out exports, data attributes and CSS utilities. Mark anything unsure as TODO.
 
 ## Component anatomy
 
@@ -83,7 +89,7 @@ Paths below are relative to `packages/ui/`.
 `packages/ui/README.md` documents this for users. Keep the two in step.
 
 - The consumer imports `lab-package/styles.css` once.
-- The consumer provides a CSS reset (Tailwind v4 preflight), `.dark` on an ancestor for dark mode, and `--font-heading` (used by `DialogTitle`).
+- The consumer provides a CSS reset (Tailwind v4 preflight), `.dark` on an ancestor for dark mode, and `--font-heading` (used by `DialogTitle` and `AlertDialogTitle`).
 - `react` / `react-dom` 19 are `peerDependencies`. Next.js is never a dependency.
 - Renaming or removing an export, prop, variant, `data-slot` or token is a breaking change. Call it out in your summary.
 
@@ -91,7 +97,7 @@ Paths below are relative to `packages/ui/`.
 
 Run the library's `typecheck`, `build` and `pack:check`, plus `build-storybook` when a component or its stories changed. Then confirm against `packages/ui/dist/`:
 
-- Each component whose source starts with `"use client"` (currently Dialog, InputGroup, InputOTP) still starts with it in `dist/components/<Name>/<Name>.js`.
+- Each component whose source starts with `"use client"` (currently AlertDialog, Dialog, InputGroup, InputOTP) still starts with it in `dist/components/<Name>/<Name>.js`.
 - `grep -r "@/" dist` returns nothing, and no `*.stories.*` file is in `dist/`.
 - The pack file list contains only `dist/**`, `README.md` and `package.json`.
 

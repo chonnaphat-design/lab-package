@@ -2,7 +2,7 @@
 
 React design system components (built in the week-1-lab app): shadcn/ui converted to Base UI primitives, styled with CSS Modules over OKLCH design tokens.
 
-Components: `Badge`, `Button`, `Dialog` (+ parts), `Input`, `InputGroup` (+ parts), `InputOTP` (+ parts), `Textarea`.
+Components: `AlertDialog` (+ parts), `Badge`, `Button`, `Dialog` (+ parts), `Input`, `InputGroup` (+ parts), `InputOTP` (+ parts), `Textarea`.
 
 ## Use
 
@@ -34,13 +34,13 @@ What the app must provide:
 
 - **A CSS reset.** Components assume Tailwind v4's preflight (`@import "tailwindcss"`), as in the original app.
 - **`.dark` on an ancestor** for dark mode (e.g. `next-themes` with `attribute="class"`).
-- **`--font-heading`** on an ancestor. `DialogTitle` uses it. Other text inherits the app's font.
+- **`--font-heading`** on an ancestor. `DialogTitle` and `AlertDialogTitle` use it. Other text inherits the app's font.
 
 **Overrides:** a Tailwind utility passed through `className` beats the component's own styles without `!important`, because utilities live in a later layer. To retheme, redefine a token on `:root` / `.dark` after importing the stylesheet.
 
 ### Server components
 
-`Dialog`, `InputGroup` and `InputOTP` ship with `"use client"`. `Badge`, `Button`, `Input` and `Textarea` have no directive, matching their source.
+`AlertDialog`, `Dialog`, `InputGroup` and `InputOTP` ship with `"use client"`. `Badge`, `Button`, `Input` and `Textarea` have no directive, matching their source.
 
 ## Develop
 

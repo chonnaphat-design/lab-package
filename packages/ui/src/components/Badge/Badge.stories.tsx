@@ -97,7 +97,7 @@ export const AsLinks: Story = {
   ),
 }
 
-/** `aria-invalid` adds a destructive border and ring. */
+/** `aria-invalid` adds a destructive border. */
 export const Invalid: Story = {
   args: { "aria-invalid": true, variant: "outline", children: "Missing" },
 }
