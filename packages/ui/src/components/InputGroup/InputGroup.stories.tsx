@@ -27,7 +27,7 @@ const meta = {
     disabled: {
       control: "boolean",
       description:
-        "Dims the addons. Pair it with `disabled` on the control, as these stories do.",
+        "Disables the control and every button inside, and dims the addons.",
     },
     className: { control: "text" },
   },
@@ -43,20 +43,16 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Icon addon at the start, button at the end. Toggle `disabled` in the controls. */
+/** Icon addon at the start, button at the end. Toggle `disabled`: it reaches the input and the button. */
 export const Playground: Story = {
   render: (args) => (
     <InputGroup {...args}>
       <InputGroupAddon>
         <SearchIcon aria-hidden />
       </InputGroupAddon>
-      <InputGroupInput
-        aria-label="Search transactions"
-        placeholder="Search"
-        disabled={args.disabled}
-      />
+      <InputGroupInput aria-label="Search transactions" placeholder="Search" />
       <InputGroupAddon align="inline-end">
-        <InputGroupButton disabled={args.disabled}>Go</InputGroupButton>
+        <InputGroupButton>Go</InputGroupButton>
       </InputGroupAddon>
     </InputGroup>
   ),
@@ -175,7 +171,7 @@ export const States: Story = {
           <InputGroupAddon>
             <MailIcon aria-hidden />
           </InputGroupAddon>
-          <InputGroupInput aria-label="Disabled email" disabled placeholder="finance" />
+          <InputGroupInput aria-label="Disabled email" placeholder="finance" />
           <InputGroupAddon align="inline-end">
             <InputGroupText>@acme.com</InputGroupText>
           </InputGroupAddon>

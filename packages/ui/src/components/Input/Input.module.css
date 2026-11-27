@@ -13,8 +13,17 @@
     @apply aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20;
   }
 
+  /* Full-strength red border in dark mode too: at 50% it was 2.46:1 against the page (now 6.78:1). */
   :global(.dark) .root[aria-invalid="true"] {
-    @apply border-destructive/50 ring-destructive/40;
+    @apply ring-destructive/40;
+  }
+
+  /*
+   * Read-only reads as plain text, not an editable box, so users don't try to type.
+   * It stays focusable, and keyboard focus still shows the ring border.
+   */
+  .root[readonly] {
+    @apply cursor-default border-transparent bg-transparent focus-visible:border-ring;
   }
 
   /*

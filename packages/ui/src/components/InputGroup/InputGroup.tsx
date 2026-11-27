@@ -9,23 +9,30 @@ import { cn } from "../../lib/utils"
 
 import styles from "./InputGroup.module.css"
 
+/** Lets the group's `disabled` reach the control and buttons inside it. */
+const InputGroupContext = React.createContext({ disabled: false })
+
 export type InputGroupProps = React.ComponentProps<"div"> & {
-  /** Dim the addons (pair with `disabled` on the control). */
+  /** Disable the control and every button inside, and dim the addons. */
   disabled?: boolean
 }
 
-function InputGroup({ className, disabled, ...props }: InputGroupProps) {
+function InputGroup({ className, disabled = false, ...props }: InputGroupProps) {
+  const context = React.useMemo(() => ({ disabled }), [disabled])
   return (
-    <div
-      data-slot="input-group"
-      role="group"
-      data-disabled={disabled || undefined}
-      // Marks the whole group inactive, so its dimmed addon text falls under
-      // WCAG 1.4.3's exception for inactive components.
-      aria-disabled={disabled || undefined}
-      className={cn(styles.root, className)}
-      {...props}
-    />
+    <InputGroupContext.Provider value={context}>
+      <div
+        data-slot="input-group"
+        role="group"
+        data-disabled={disabled || undefined}
+        // Marks the whole group inactive, so its dimmed addon text falls under
+        // WCAG 1.4.3's exception for inactive components. True now that the
+        // controls inside are disabled too.
+        aria-disabled={disabled || undefined}
+        className={cn(styles.root, className)}
+        {...props}
+      />
+    </InputGroupContext.Provider>
   )
 }
 
@@ -43,8 +50,8 @@ function InputGroupAddon({
   ...props
 }: InputGroupAddonProps) {
   return (
+    // No role: addons are layout, and an unnamed "group" per addon is noise for screen readers.
     <div
-      role="group"
       data-slot="input-group-addon"
       data-align={align}
       className={cn(styles.addon, className)}
@@ -71,13 +78,16 @@ function InputGroupButton({
   type = "button",
   variant = "ghost",
   size = "xs",
+  disabled,
   ...props
 }: InputGroupButtonProps) {
+  const group = React.useContext(InputGroupContext)
   return (
     <Button
       type={type}
       variant={variant}
       size={size}
+      disabled={disabled ?? group.disabled}
       className={cn(styles.button, className)}
       {...props}
     />
@@ -88,12 +98,26 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
   return <span className={cn(styles.text, className)} {...props} />
 }
 
-function InputGroupInput(props: InputProps) {
-  return <Input data-slot="input-group-control" {...props} />
+function InputGroupInput({ disabled, ...props }: InputProps) {
+  const group = React.useContext(InputGroupContext)
+  return (
+    <Input
+      data-slot="input-group-control"
+      disabled={disabled ?? group.disabled}
+      {...props}
+    />
+  )
 }
 
-function InputGroupTextarea(props: TextareaProps) {
-  return <Textarea data-slot="input-group-control" {...props} />
+function InputGroupTextarea({ disabled, ...props }: TextareaProps) {
+  const group = React.useContext(InputGroupContext)
+  return (
+    <Textarea
+      data-slot="input-group-control"
+      disabled={disabled ?? group.disabled}
+      {...props}
+    />
+  )
 }
 
 export {

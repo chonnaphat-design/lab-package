@@ -18,7 +18,8 @@
 | A decision that needs the content the dialog would cover             | Inline content on the page                                       |
 | Confirming a common action that can be undone                        | Just do it, and offer undo                                       |
 | Information only, with no decision to make                           | Inline content. Don't interrupt.                                 |
-| Opening from another dialog                                          | Never stack dialogs. Replace the content or move to a page.      |
+| Opening from another dialog                                          | Avoid stacking dialogs. Replace the content or move to a page. Most systems forbid it; GitHub Primer allows two at most. |
+| Content that needs scrolling on a laptop screen                      | A separate page. A dialog can scroll, but only as a fallback.    |
 
 ## Writing the content
 
@@ -44,6 +45,50 @@ A dialog is built from these parts, top to bottom:
 | **DialogFooter**                    | The actions row.                                                                         |
 | **DialogClose**                     | Closes the dialog. Render it as a Button for Cancel, or for an action that also closes. |
 
+## Import and use
+
+Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
+
+```bash
+npm install lab-package
+```
+
+```tsx
+import "lab-package/styles.css"
+```
+
+Then import the component where you use it:
+
+```tsx
+import {
+  Button,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "lab-package"
+
+<Dialog>
+  <DialogTrigger render={<Button />}>Rename</DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Rename account</DialogTitle>
+    </DialogHeader>
+    <DialogFooter>
+      <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+- Import only the parts you use. Buttons come from the same package.
+- Dialog ships with `"use client"`, so a dialog that only opens and closes renders from a Server Component. Controlling `open`, or saving a form, needs a file that starts with `"use client"`.
+- Define `--font-heading` in your app; the title uses it.
+
 ## Props and variants
 
 Dialog has **no `variant` or `size` props**. Every dialog uses the same panel. Style the buttons inside it with Button's own variants.
@@ -54,15 +99,15 @@ Dialog has **no `variant` or `size` props**. Every dialog uses the same panel. S
 | ------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `defaultOpen`             | `false` | Starts open. The dialog then manages its own open state.                                                                                           |
 | `open` + `onOpenChange`   | none    | Lets the app control when it is open, for example to close only after a save succeeds.                                                            |
-| `modal`                   | `true`  | `true`: focus is trapped, page scroll is locked, the page behind can't be clicked. `"trap-focus"`: focus is trapped, but the page can still scroll and be clicked. `false`: the page stays usable. |
-| `disablePointerDismissal` | `false` | When `true`, clicking the backdrop no longer closes the dialog. Esc, × and Cancel still close it.                                                  |
+| `modal`                   | `true`  | `true`: focus is trapped, page scroll is locked, the page behind can't be clicked. `"trap-focus"`: focus is trapped, but the page can still scroll and be clicked. `false`: the page stays usable, for helper tools the user works alongside, such as find and replace. |
+| `disablePointerDismissal` | `false` | When `true`, clicking the backdrop no longer closes the dialog. Esc, × and Cancel still close it. **Set it on any dialog with a form**, so a stray click doesn't throw away what the user typed. |
 
 ### DialogContent
 
 | Prop              | Default | What it does                                                                                                     |
 | ----------------- | ------- | ---------------------------------------------------------------------------------------------------------------- |
 | `showCloseButton` | `true`  | Shows the × button in the top-right corner. It is a small ghost icon button labelled "Close" for screen readers. |
-| `initialFocus`    | first focusable element | Which element gets focus when the dialog opens. Opened by touch, the panel itself is focused instead, so the on-screen keyboard doesn't pop up. |
+| `initialFocus`    | first focusable element | Which element gets focus when the dialog opens. The × comes last, so in a form dialog the first field gets focus, as WAI-ARIA, IBM Carbon and Microsoft Fluent recommend. Opened by touch, the panel itself is focused instead, so the on-screen keyboard doesn't pop up. |
 | `finalFocus`      | the trigger | Which element gets focus back when the dialog closes.                                                      |
 
 ### DialogFooter
@@ -77,10 +122,23 @@ Both take `render` to show as a Button, such as `render={<Button variant="outlin
 
 ### Built-in behaviour
 
-- **Opening:** the backdrop and panel fade in over 100ms. The panel also scales up slightly.
+- **Opening:** the backdrop and panel fade in over 100ms, at the fast end of what Material and Carbon use. The panel also scales up slightly. TODO: the animation still plays when the user has asked for reduced motion. WCAG only requires that at AAA.
 - **Closing:** Esc, the ×, any DialogClose, or a click on the backdrop. Focus goes back to the trigger.
-- **Layout:** the panel is centred on screen, up to 448px wide on screens 640px and wider, and the full width minus 16px each side on smaller screens. 24px padding and 24px between sections. TODO: there is no max height or scrolling for long content. Confirm how a dialog taller than the screen should behave.
-- **Footer on small screens:** buttons stack full-width, with the last button in the code (the main action) on top. From 640px they sit in a row, right-aligned, with the main action on the right.
+- **Layout:** the panel is centred on screen, up to 448px wide on screens 640px and wider, and the full width minus 16px each side on smaller screens. 24px padding and 24px between sections.
+- **One width only.** Most systems offer three to five sizes, and GitHub Primer makes form dialogs full screen on phones. TODO: decide whether Dialog needs sizes or a full-screen mode on mobile.
+
+**Tall content scrolls inside the panel.** The panel is never taller than the screen minus 16px top and bottom. When content is longer, the whole panel scrolls, title and buttons included, so everything stays reachable on a phone and at 400% browser zoom (WCAG 1.4.10 Reflow). Tabbing to a button scrolls it into view.
+
+TODO: IBM Carbon, Microsoft Fluent and GitHub Primer keep the title and buttons fixed while only the body scrolls. Ours scrolls everything, which works at any zoom but hides the buttons in a long dialog until the user scrolls. Decide whether to pin them, and how that behaves at 400% zoom.
+
+### Forms in a dialog
+
+- **Wrap the fields and the footer in one form**, and make the main action a `type="submit"` Button rather than a DialogClose. Then Enter in a field submits it. The `Playground` story has no form, so Enter does nothing there.
+- **Keep the dialog open until the save succeeds.** Control it with `open` and `onOpenChange`, and close it yourself on success.
+- **Show errors inside the dialog**, next to the field, with Input's `invalid`. Don't close the dialog to report them.
+- **Set `disablePointerDismissal`** so a click on the backdrop doesn't lose the user's input.
+- TODO: Dialog has no loading state for its submit button. AlertDialogAction has one; Dialog doesn't yet. Until it does, prevent double submits in the app.
+- TODO: there is no pattern yet for asking "Discard changes?" when the user closes a dialog with unsaved input.
 
 ### Destructive confirmations
 
@@ -109,7 +167,7 @@ You still have to:
 | `--radius`            | Panel corners: 2.6 × `--radius` (26px)                                                 |
 | `--font-heading`      | Title font. **Your app must define it.** It is not in the shipped tokens.              |
 
-The backdrop is fixed black at 80% opacity with a light blur, not a token. TODO: confirm whether the backdrop should become a token so it can be themed.
+The backdrop is fixed black at 80% opacity with a light blur, not a token. That is much heavier than Material's 32% dim, and none of the systems reviewed use a blur. TODO: decide on the backdrop strength, and whether it should become a token so it can be themed.
 
 The × button, the footer "Close" button and any Buttons you place inside use Button's tokens. See [Button.md](../Button/Button.md).
 
@@ -156,4 +214,4 @@ import {
 </Dialog>
 ```
 
-On open, focus goes to the Amount field, the first focusable element.
+On open, focus goes to the Amount field, the first focusable element. In a real form, wrap the field and footer in a form and make Transfer a submit button. See [Forms in a dialog](#forms-in-a-dialog).

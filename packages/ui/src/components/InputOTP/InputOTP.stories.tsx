@@ -36,7 +36,7 @@ function OTPDemo({
 }: OTPDemoProps) {
   const [value, setValue] = React.useState(initialValue)
   const slot = (index: number) => (
-    <InputOTPSlot key={index} index={index} aria-invalid={invalid || undefined} />
+    <InputOTPSlot key={index} index={index} />
   )
   const split = withSeparator && length === 6
 
@@ -46,6 +46,7 @@ function OTPDemo({
       value={value}
       onChange={setValue}
       disabled={disabled}
+      invalid={invalid}
       pattern={digitsOnly ? REGEXP_ONLY_DIGITS : undefined}
       aria-label={label}
     >
@@ -91,7 +92,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Click and type. Change length, separator, digits-only, invalid and disabled in the controls. */
+/** Click and type, or paste a code such as "428 193": spaces and dashes are stripped. */
 export const Playground: Story = {}
 
 /** Partly filled: the next slot shows the blinking caret when the field has focus. */
@@ -103,7 +104,7 @@ export const Filled: Story = {
   args: { initialValue: "428193" },
 }
 
-/** `aria-invalid` on the slots turns their borders and ring destructive. */
+/** `invalid` marks the field invalid for screen readers and turns every slot red. */
 export const Invalid: Story = {
   args: { initialValue: "428", invalid: true },
 }

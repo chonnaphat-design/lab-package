@@ -40,7 +40,7 @@ Paths below are relative to `packages/ui/`.
 
 ## Library layout (`packages/ui/src`)
 
-- `components/<Name>/`: `<Name>.tsx` (markup and behavior), `<Name>.module.css` (all styles), `index.ts` (component + prop types), `<Name>.stories.tsx` (Storybook), `<Name>.md` (usage doc, see [Component docs](#component-docs)). Button also has a `README.md` with implementation notes for maintainers.
+- `components/<Name>/`: `<Name>.tsx` (markup and behavior), `<Name>.module.css` (all styles), `index.ts` (component + prop types), `<Name>.stories.tsx` (Storybook), `<Name>.md` (usage doc, see [Component docs](#component-docs)), `<Name>.mdx` (the same doc in Thai, shown in Storybook). Button also has a `README.md` with implementation notes for maintainers.
 - `index.ts`: the public barrel. A component is public only after it is exported here.
 - `lib/utils.ts`: `cn`, re-exported from the `cn` npm package (shadcn's clsx + tailwind-merge replacement).
 - `styles/tokens.css` (**shipped**): `:root` (light) and `.dark` variables, plus the global `border-color` / `outline-color` base rule that components rely on. Keep light and dark values in sync.
@@ -48,9 +48,18 @@ Paths below are relative to `packages/ui/`.
 
 ## Component docs
 
-Before building or reviewing UI, read the `<Name>.md` doc beside each component you use, in `packages/ui/src/components/<Name>/`. Use only the props, variants and tokens listed there. If something you need is not documented, stop and ask.
+Before building or reviewing UI, read the `<Name>.md` doc beside each component you use, in `packages/ui/src/components/<Name>/`. For example, any UI with a button means reading `packages/ui/src/components/Button/Button.md` first. Use only the props, variants and tokens listed there. If something you need is not documented, stop and ask.
 
-When you add or change a component, write or update its `<Name>.md` in the same change, matching `Dialog.md`: Purpose (one line), When to use, When not to use, Props and variants, Tokens used, and one example taken from the stories. Write it for designers and agents building UI, so leave out exports, data attributes and CSS utilities. Mark anything unsure as TODO.
+When you add or change a component, write or update its `<Name>.md` in the same change, matching `Dialog.md`: Purpose (one line), When to use, When not to use, Import and use, Props and variants, Tokens used, and one example taken from the stories. Write it for designers and agents building UI, so leave out data attributes and CSS utilities. **Import and use** shows the package install, the one-time `lab-package/styles.css` import, the import line with every public part of the component, a minimal snippet, and whether the file needs `"use client"` in Next.js. Mark anything unsure as TODO.
+
+### Keep the Storybook page in step
+
+The English `<Name>.md` is the source of truth. `<Name>.mdx` beside it is the same doc in Thai, shown in Storybook as the component's **คู่มือการใช้งาน** page. `packages/ui/src/Introduction.mdx` is the Thai landing page.
+
+- **Whenever a `<Name>.md` changes, update its `<Name>.mdx` in the same change**, section for section: the same facts, numbers, props, TODOs and code. Code blocks stay identical; only the prose is Thai.
+- A new component gets both files, and its `.mdx` attaches to the stories with `<Meta of={…Stories} name="คู่มือการใช้งาน" />` and shows its example with `<Canvas of={…} />`.
+- A change to the consumer contract (install, stylesheet, `--font-heading`, `.dark`) or to the token list also updates `Introduction.mdx`.
+- Never leave a `.md` change without its `.mdx` counterpart. If you can't translate it, stop and ask.
 
 ## Component anatomy
 
@@ -81,7 +90,7 @@ When you add or change a component, write or update its `<Name>.md` in the same 
 - **Stories sit beside their component:** `packages/ui/src/components/<Name>/<Name>.stories.tsx`, matched by `stories` in `apps/storybook/.storybook/main.ts`. They import the component relatively (`./Button`), so edits hot-reload without rebuilding `dist/`.
 - **Tailwind runs through `@tailwindcss/vite`**, added in `main.ts` `viteFinal`. It compiles both the preview stylesheet and the components' CSS Modules.
 - **`.storybook/preview.ts` imports `preview.css`**, which plays the consumer. It imports the library's `reference.css` (Tailwind reset + `--color-*` mapping, so story utilities like `text-muted-foreground` work) and `tokens.css`, `@source`s `packages/ui/src` so `className` overrides in stories get generated, and sets page colors.
-- **No addons** (initialised with `--no-features`). Dark mode is checked with a story that wraps components in `<div className="dark …">`. Hover, focus-visible and active are checked by hand.
+- **One addon: `@storybook/addon-docs`**, with `remark-gfm` so MDX tables render. It turns `autodocs` into a props page and loads the Thai `.mdx` guideline pages (matched by `packages/ui/src/**/*.mdx`). A guideline page attaches to its stories with `<Meta of={…Stories} name="คู่มือการใช้งาน" />` and shows its example with `<Canvas of={…} />`. Dark mode is checked with a story that wraps components in `<div className="dark …">`. Hover, focus-visible and active are checked by hand.
 - **One `<Name>.stories.tsx` per component**, titled `Components/<Name>`, tagged `autodocs`. `Button.stories.tsx` is the model: a `Playground` with a control for every prop, then one story per prop axis (variants, sizes, icons), a `StateMatrix` (variants × prop-driven states), `Dark`, `render` usage, and a `className` override. Write stories as correct real usage, e.g. `aria-label` on `iconOnly` buttons.
 
 ## Consumer contract
@@ -95,7 +104,11 @@ When you add or change a component, write or update its `<Name>.md` in the same 
 
 ## Checks after a change
 
-Run the library's `typecheck`, `build` and `pack:check`, plus `build-storybook` when a component or its stories changed. Then confirm against `packages/ui/dist/`:
+Run the library's `typecheck`, `build` and `pack:check`, plus `build-storybook` when a component, its stories, or a `.md` / `.mdx` doc changed. Then confirm:
+
+- Every `<Name>.md` in `git status` has its `<Name>.mdx` changed too, and the Storybook build lists each component's **คู่มือการใช้งาน** page.
+
+And against `packages/ui/dist/`:
 
 - Each component whose source starts with `"use client"` (currently AlertDialog, Dialog, InputGroup, InputOTP) still starts with it in `dist/components/<Name>/<Name>.js`.
 - `grep -r "@/" dist` returns nothing, and no `*.stories.*` file is in `dist/`.

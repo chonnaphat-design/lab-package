@@ -9,12 +9,20 @@ export type TextareaProps = React.ComponentProps<"textarea"> & {
   invalid?: boolean
 }
 
-function Textarea({ className, invalid, ...props }: TextareaProps) {
+function Textarea({ className, invalid, rows, style, ...props }: TextareaProps) {
   return (
     <textarea
       data-slot="textarea"
       aria-invalid={invalid || undefined}
       className={cn(styles.root, className)}
+      rows={rows}
+      // The field grows with its content, which makes browsers ignore `rows`.
+      // Pass it to CSS so the starting height still follows it.
+      style={
+        rows
+          ? ({ "--textarea-rows": rows, ...style } as React.CSSProperties)
+          : style
+      }
       {...props}
     />
   )

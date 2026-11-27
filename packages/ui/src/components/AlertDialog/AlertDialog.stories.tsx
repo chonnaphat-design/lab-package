@@ -160,6 +160,69 @@ export const Controlled: Story = {
   },
 }
 
+/**
+ * An action that waits for a server. Returning a promise from `onClick` keeps
+ * the dialog open with a spinner on the action; Cancel and Esc are blocked.
+ * The first try fails and shows an error inside the dialog; the second succeeds.
+ */
+export const AsyncAction: Story = {
+  parameters: ownFrame,
+  render: () => {
+    const [attempts, setAttempts] = React.useState(0)
+    const [error, setError] = React.useState<string | null>(null)
+    const [result, setResult] = React.useState("Not deleted yet")
+
+    async function deleteStatement() {
+      setError(null)
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const attempt = attempts + 1
+      setAttempts(attempt)
+      if (attempt === 1) {
+        setError("The server didn't respond. Nothing was deleted. Try again.")
+        throw new Error("Request failed")
+      }
+      setResult("Statement deleted")
+    }
+
+    return (
+      <div className="grid justify-items-start gap-3">
+        <p className="text-sm text-muted-foreground" aria-live="polite">
+          {result}
+        </p>
+        <AlertDialog
+          defaultOpen
+          onOpenChange={(open) => {
+            if (!open) setError(null)
+          }}
+        >
+          <AlertDialogTrigger render={<Button variant="danger" />}>
+            Delete statement
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete the March statement?</AlertDialogTitle>
+              <AlertDialogDescription>
+                It is removed for everyone on this account. This cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            {error && (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction variant="danger" onClick={deleteStatement}>
+                Delete statement
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    )
+  },
+}
+
 /** Open in dark mode (`.dark` on <html>). */
 export const Dark: Story = {
   args: { defaultOpen: true },

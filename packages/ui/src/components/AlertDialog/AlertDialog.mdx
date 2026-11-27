@@ -1,0 +1,221 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks"
+
+import * as AlertDialogStories from "./AlertDialog.stories"
+
+<Meta of={AlertDialogStories} name="คู่มือการใช้งาน" />
+
+# AlertDialog
+
+**วัตถุประสงค์:** หน้าต่างซ้อนที่หยุดผู้ใช้ไว้ และให้ยืนยันหรือยกเลิกการกระทำที่มีผลสำคัญหนึ่งอย่างก่อนที่จะเกิดขึ้น
+
+## ควรใช้เมื่อ
+
+- **ก่อนการกระทำที่ไม่ค่อยเกิดและย้อนกลับไม่ได้** เช่น ลบบัญชี เพิกถอนคีย์ ยกเลิกการชำระเงิน
+- **ก่อนการกระทำที่มีผลสำคัญที่ผู้ใช้อาจกดพลาด** เช่น โอนเงิน เผยแพร่ถึงลูกค้า
+- เมื่อผู้ใช้ต้องตอบก่อนไปต่อ และมีคำตอบที่สมเหตุสมผลแค่สองแบบ: ทำต่อ หรือไม่ทำ
+
+ใช้ให้น้อย เมื่อผู้คนเห็นการยืนยันกับการกระทำทั่วไปบ่อย ๆ จะเรียนรู้ที่จะกดผ่านโดยไม่อ่าน
+
+## ไม่ควรใช้เมื่อ
+
+| แทนที่จะใช้ alert dialog กับ… | ให้ใช้ |
+| ----------------------------- | ------ |
+| งานที่มีช่องกรอก เช่น ฟอร์มหรือการเปลี่ยนชื่อ | **Dialog** |
+| การกระทำทั่วไปที่ย้อนกลับได้ แม้จะเป็นการลบ | ทำไปเลยแล้วให้ undo ไม่ต้องถามก่อน |
+| ข้อความแจ้งสำเร็จหรือข้อมูลที่ไม่มีอะไรให้ตัดสินใจ | ข้อความในหน้าหรือ toast TODO: ยังไม่มีทั้งสองอย่าง |
+| ข้อความตอนโหลดหน้า ก่อนผู้ใช้ทำอะไร | เนื้อหาในหน้า |
+| การลบที่ร้ายแรงและกว้างขวาง ที่ต้องให้ผู้ใช้พิมพ์ชื่อเพื่อยืนยัน | TODO: ยังไม่มีแนวทาง ใช้เฉพาะการกระทำที่เกิดไม่บ่อยและผลกระทบสูง และออกแบบผ่านการรีวิวดีไซน์ |
+| ข้อผิดพลาดของฟอร์ม | แสดงข้างช่องในหน้า ด้วย `invalid` ของ Input |
+| ตัวเลือกมากกว่าสองแบบ | TODO: ยังไม่มีแนวทาง อย่าเพิ่มปุ่มที่สามโดยไม่ผ่านการรีวิวดีไซน์ |
+
+## การเขียนเนื้อหา
+
+- **หัวข้อ:** เป็นคำถามที่บอกการกระทำและสิ่งที่ถูกกระทำ เช่น "Delete this account?" หรือ "Send $2,400.00 to Northwind Ltd?" หลีกเลี่ยง "Are you sure?" และ "Warning!"
+- **คำอธิบาย:** ต้องมีเสมอ บอกว่าจะเกิดอะไร อะไรได้รับผลกระทบ และย้อนกลับได้หรือไม่ ในหนึ่งหรือสองประโยค อย่าซ้ำหัวข้อ
+- **ปุ่มยืนยัน:** ใช้คำกริยาเดียวกับหัวข้อ เช่น "Delete account" หรือ "Send payment" ห้ามใช้ "OK", "Yes" หรือ "Confirm" ใช้ "Delete" เมื่อสิ่งนั้นถูกทำลาย และ "Remove" เมื่อยังมีอยู่ที่อื่น
+- **ปุ่มยกเลิก:** "Cancel" แนวทางส่วนใหญ่ต้องการคำนี้พอดี story ยังใช้ "Keep account" และ "Keep key" ซึ่งบอกว่าเก็บอะไรไว้ TODO: เลือกกฎเดียวสำหรับผลิตภัณฑ์
+- **ลำดับ:** Cancel ก่อน แล้วจึงปุ่มยืนยัน บนจอกว้างปุ่มยืนยันอยู่ทางขวา บนจอเล็กอยู่บนสุด
+- **อย่าพึ่งสี:** ปุ่ม `danger` สีแดงต้องมีข้อความบอกว่าจะทำลายอะไร ความหมายจึงไม่ขึ้นกับการเห็นสีแดง
+
+## ส่วนประกอบ
+
+| ส่วน | หน้าที่ |
+| ---- | ------- |
+| **AlertDialog** | เก็บสถานะเปิด/ปิด ไม่ได้แสดงอะไรเอง |
+| **AlertDialogTrigger** | control ที่เปิด มักแสดงเป็น Button |
+| **AlertDialogContent** | ตัวแผง มีฉากหลังมืดของตัวเอง **ไม่มีปุ่ม ×** ผู้ใช้ตอบด้วยปุ่ม |
+| **AlertDialogHeader** | วางหัวข้อและคำอธิบายซ้อนกัน |
+| **AlertDialogTitle** | จำเป็น คำถาม โปรแกรมอ่านหน้าจอประกาศเมื่อเปิด |
+| **AlertDialogDescription** | จำเป็น ผลที่จะเกิดขึ้น WAI-ARIA คาดว่าทุก alert dialog มีข้อความนี้ และโปรแกรมอ่านหน้าจอประกาศเมื่อเปิด |
+| **AlertDialogFooter** | ปุ่มสองปุ่ม |
+| **AlertDialogCancel** | คำตอบที่ปลอดภัย ปิด dialog และไม่ทำอะไรอื่น |
+| **AlertDialogAction** | คำตอบยืนยัน ทำงานตาม click handler แล้วปิด dialog หรือรองานที่ช้าก่อน |
+
+## การนำเข้าและใช้งาน
+
+ติดตั้งแพ็กเกจ แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
+
+```bash
+npm install lab-package
+```
+
+```tsx
+import "lab-package/styles.css"
+```
+
+จากนั้นนำเข้า component ในไฟล์ที่ใช้
+
+```tsx
+"use client"
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Button,
+} from "lab-package"
+
+<AlertDialog>
+  <AlertDialogTrigger render={<Button variant="danger" />}>Delete account</AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Delete this account?</AlertDialogTitle>
+      <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction variant="danger" onClick={deleteAccount}>Delete account</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+- AlertDialog มี `"use client"` มาในตัว ปุ่มยืนยันต้องมี `onClick` ไฟล์ที่ใช้จึงขึ้นต้นด้วย `"use client"` ด้วย ตามตัวอย่าง
+- `deleteAccount` เป็นฟังก์ชัน `async` ได้ dialog จะรอจนเสร็จ ดูหัวข้อ AlertDialogAction ด้านล่าง
+- กำหนด `--font-heading` ในแอป เพราะหัวข้อใช้ฟอนต์นี้
+
+## Props และ variants
+
+AlertDialog **ไม่มี `variant` หรือ `size` ของตัวเอง** ทุก alert dialog ใช้แผงเดียวกับ Dialog ปุ่มสองปุ่มใช้ `variant` และ `size` ของ Button
+
+### AlertDialog
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `defaultOpen` | `false` | เปิดตั้งแต่แรก |
+| `open` + `onOpenChange` | ไม่มี | ให้แอปควบคุมว่าเปิดเมื่อไร เช่น เปิดหลังเหตุการณ์อื่น |
+
+ไม่มี prop `modal` หรือ `disablePointerDismissal` ต่างจาก Dialog เพราะเป็น modal เสมอและไม่ปิดเมื่อคลิกฉากหลัง
+
+### AlertDialogAction
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `variant` | `primary` | ใช้ `danger` กับการกระทำที่ย้อนกลับไม่ได้ ใช้ `primary` กับที่เหลือ |
+| `size` | `md` | ขนาดปุ่ม: `xs`, `sm`, `md` หรือ `lg` ให้เท่ากับ Cancel |
+| `onClick` | ไม่มี | ทำการกระทำ ถ้างานเสร็จทันที dialog จะปิดตามมา ถ้าคืนค่าเป็น promise ดูด้านล่าง |
+| `disabled` | `false` | ปิดใช้งานปุ่ม |
+
+**งานที่ช้า เช่น การส่งคำขอไปเซิร์ฟเวอร์:** ให้ `onClick` คืนค่าเป็น promise (ฟังก์ชัน `async` ทำแบบนั้น) แล้ว
+- dialog **เปิดค้างไว้** ขณะทำงาน มีไอคอนหมุนบนปุ่มยืนยัน
+- ปุ่มยืนยัน Cancel และ Esc ถูกบล็อก ผู้ใช้จึงยกเลิกกลางคันหรือส่งซ้ำไม่ได้
+- เมื่อ promise **สำเร็จ** dialog จะปิด
+- เมื่อ **ล้มเหลว** dialog ยังเปิดอยู่และปุ่มทั้งสองใช้ได้อีกครั้ง ผู้ใช้จึงลองใหม่หรือยกเลิกได้ แสดงว่าผิดพลาดอะไรภายใน dialog ระหว่างคำอธิบายกับปุ่ม ด้วย `role="alert"` เพื่อให้โปรแกรมอ่านหน้าจอประกาศ บอกว่ามีอะไรเปลี่ยนหรือไม่ เช่น "Nothing was deleted"
+
+แบบนี้ตามแนวทางของ Shopify Polaris, GitHub Primer และ IBM Carbon คือ ปิดหลังสำเร็จเท่านั้น แสดงการโหลดบนปุ่ม และเก็บข้อผิดพลาดไว้ใน dialog ดู story `AsyncAction`
+
+TODO: โปรแกรมอ่านหน้าจอไม่ได้รับแจ้งเมื่องานเริ่ม ปุ่มถูกทำเครื่องหมายว่ากำลังทำงาน แต่โปรแกรมอ่านหน้าจอส่วนใหญ่ไม่ประกาศ ตัดสินใจว่าจะเพิ่มข้อความพูด "Deleting…" หรือไม่
+
+TODO: ยังไม่มีส่วนสำหรับข้อความผิดพลาดในตัว story แสดงข้อความเป็นย่อหน้าสั้นสีแดง ยืนยันว่าเป็นแนวทาง หรือเพิ่มส่วนนี้ใน component
+
+### AlertDialogCancel
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `variant` | `outline` | ใช้ `outline` ตามเดิม |
+| `size` | `md` | ให้เท่ากับปุ่มยืนยัน |
+
+Cancel ถูกปิดใช้งานอัตโนมัติขณะงานที่ช้าจากปุ่มยืนยันกำลังทำงาน
+
+### AlertDialogContent
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `initialFocus` | element แรกที่โฟกัสได้ | element ที่ได้โฟกัสเมื่อเปิด เมื่อ Cancel อยู่ก่อน Cancel จะได้โฟกัส ตามที่ WAI-ARIA แนะนำสำหรับการกระทำที่ทำลายข้อมูล |
+| `finalFocus` | ปุ่มที่เปิด | element ที่ได้โฟกัสคืนเมื่อปิด ถ้าการกระทำลบรายการของปุ่มที่เปิดไปแล้ว ให้ชี้ไปที่ element ที่ยังอยู่ เช่น ลิสต์หรือหัวข้อของลิสต์ |
+
+TODO: สำหรับการยืนยันที่ **ไม่ได้** ทำลายข้อมูล (ปุ่ม `primary`) GitHub Primer ให้โฟกัสที่ปุ่มยืนยันแทน Cancel ส่วน WAI-ARIA ไม่ได้ระบุ component โฟกัส Cancel เสมอเว้นแต่ตั้ง `initialFocus` ตัดสินใจว่าการยืนยันที่ไม่ทำลายข้อมูลควรต่างไปหรือไม่
+
+### พฤติกรรมในตัว
+
+- **การปิด:** Esc, Cancel หรือปุ่มยืนยัน การคลิกฉากหลัง **ไม่** ปิด ขณะงานที่ช้าจากปุ่มยืนยันกำลังทำงาน ไม่มีอะไรปิดได้
+- **โฟกัส:** ไปที่ปุ่มแรก (Cancel) เมื่อเปิด อยู่ใน dialog และกลับไปที่ปุ่มที่เปิดเมื่อปิด เมื่อเปิดด้วยการแตะ ตัวแผงจะได้โฟกัสแทน
+- **โปรแกรมอ่านหน้าจอ:** ประกาศเป็น alert dialog ใช้หัวข้อเป็นชื่อและคำอธิบายเป็นข้อความ หน้าด้านหลังถูกซ่อนจากโปรแกรมอ่านหน้าจอและคีย์บอร์ด
+- **หน้า:** เลื่อนไม่ได้และคลิกหน้าด้านหลังไม่ได้
+- **การเปิด:** ฉากหลังและแผงค่อย ๆ ปรากฏใน 100ms แผงขยายขึ้นเล็กน้อย
+- **Layout:** แผงเดียวกับ Dialog อยู่กลางจอ กว้างไม่เกิน 448px บนจอตั้งแต่ 640px และกว้างเต็มจอลบด้านละ 16px บนจอที่เล็กกว่า ระยะขอบ 24px ไม่สูงเกินจอลบด้านบนและล่างด้านละ 16px เนื้อหาที่ยาวกว่าจะเลื่อนภายใน
+- **ส่วนท้าย:** บนจอเล็กเรียงซ้อนเต็มความกว้าง ปุ่มยืนยันอยู่บนสุด ตั้งแต่ 640px เป็นแถวชิดขวา ปุ่มยืนยันอยู่ทางขวา
+- **พื้นที่กด:** ปุ่มทั้งสองสูงอย่างน้อย 36px เกินขั้นต่ำ 24px
+
+TODO: บนจอเล็ก ปุ่มยืนยันแสดง **เหนือ** Cancel แต่ Tab ยังไปที่ Cancel ก่อน ลำดับที่เห็นกับลำดับคีย์บอร์ดจึงไม่ตรงกัน เป็นไปตาม Apple, Material และ Carbon แต่ยังไม่ได้ตรวจกับกฎลำดับโฟกัสของ WCAG
+
+## Tokens ที่ใช้
+
+| Token | ใช้สำหรับ |
+| ----- | --------- |
+| `--popover` | พื้นหลังแผง |
+| `--popover-foreground` | ตัวอักษรในแผง |
+| `--foreground` | วงขอบ 1px รอบแผง ความทึบ 5% |
+| `--muted-foreground` | ตัวอักษรคำอธิบาย ลิงก์ในนั้นเปลี่ยนเป็น `--foreground` เมื่อชี้ |
+| `--radius` | มุมของแผง: 2.6 × `--radius` (26px) |
+| `--font-heading` | ฟอนต์หัวข้อ **แอปต้องกำหนดเอง** ไม่อยู่ใน token ที่ส่งมากับแพ็กเกจ |
+
+ฉากหลังเป็นสีดำ 80% เบลอเล็กน้อย ไม่ใช่ token TODO: ยืนยันว่าควรเป็น token หรือไม่ เป็นคำถามเดียวกับ Dialog
+
+ปุ่มใช้ token ของ Button `danger` ใช้ `--destructive`
+
+หัวข้อ 16px medium คำอธิบาย 14px โหมดมืดตามคลาส `.dark` บน `<html>` หรือ element ที่ครอบหน้า
+
+## ตัวอย่าง
+
+จาก story `Destructive` (story สร้างจาก controls และเปิดตั้งแต่แรกด้วย `defaultOpen` ซึ่งไม่ได้ใส่ในโค้ดด้านล่าง เพราะการยืนยันจริงเปิดจากปุ่มที่เปิด)
+
+<Canvas of={AlertDialogStories.Destructive} />
+
+```tsx
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Button,
+} from "lab-package"
+
+<AlertDialog>
+  <AlertDialogTrigger render={<Button variant="danger" />}>Delete account</AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Delete this account?</AlertDialogTitle>
+      <AlertDialogDescription>
+        Its balance must be zero. Statements stay available for 7 years. This
+        cannot be undone.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Keep account</AlertDialogCancel>
+      <AlertDialogAction variant="danger">Delete account</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```

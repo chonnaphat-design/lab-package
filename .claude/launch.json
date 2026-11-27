@@ -4,8 +4,29 @@
     {
       "name": "storybook",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "storybook", "-w", "@lab-package/storybook", "--", "--ci"],
+      "runtimeArgs": [
+        "run",
+        "storybook",
+        "-w",
+        "@lab-package/storybook",
+        "--",
+        "--ci"
+      ],
       "port": 6006
+    },
+    {
+      "name": "storybook-static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "6007",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "apps/storybook/storybook-static"
+      ],
+      "port": 6007
     }
   ]
 }

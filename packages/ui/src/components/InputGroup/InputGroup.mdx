@@ -1,0 +1,204 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks"
+
+import * as InputGroupStories from "./InputGroup.stories"
+
+<Meta of={InputGroupStories} name="คู่มือการใช้งาน" />
+
+# InputGroup
+
+**วัตถุประสงค์:** ช่องกรอกที่มีไอคอน ข้อความคงที่ หรือปุ่มเล็กติดอยู่ในกรอบเดียวกัน จึงอ่านเป็น control เดียว
+
+## ควรใช้เมื่อ
+
+- ช่องค้นหาที่มีไอคอนแว่นขยายและปุ่ม "Go"
+- จำนวนเงินที่มีสกุลเงินคงที่ก่อนหรือหลัง เช่น `$` และ `USD`
+- อีเมลที่มีโดเมนคงที่ต่อท้าย เช่น `@acme.com`
+- ค่าอ่านอย่างเดียวที่มีปุ่มคัดลอก เช่น ลิงก์ใบแจ้งหนี้
+- ช่องกรอกรหัสที่มีปุ่ม "Apply" เช่น รหัสส่วนลด
+- กล่องข้อความที่มีหัวข้ออยู่ด้านบน หรือปุ่มแนบไฟล์และส่งอยู่ด้านล่าง
+
+## ไม่ควรใช้เมื่อ
+
+| แทนที่จะใช้ input group กับ… | ให้ใช้ |
+| ---------------------------- | ------ |
+| ช่องธรรมดาที่ไม่มีอะไรติด | **Input** หรือ **Textarea** |
+| ปุ่มขนาดเต็มข้างช่อง เช่น ปุ่มส่งฟอร์ม | **Button** ข้างช่อง |
+| หน่วยที่ผู้ใช้เลือกได้ เช่น ตัวเลือกสกุลเงิน | TODO: ยังไม่มี Select |
+| สัญลักษณ์ที่คนอาจไม่รู้จัก | บอกใน label แทน เช่น "Weight, in kilograms" |
+| ปุ่มสามปุ่มขึ้นไป หรือข้อความท้ายยาวบนจอแคบ | ลดสิ่งที่ติดลง เพราะเบียดพื้นที่สำหรับพิมพ์ |
+| คำแนะนำหรือข้อความผิดพลาดใต้ช่อง | TODO: ยังไม่มี component คำอธิบายช่องหรือข้อความผิดพลาด |
+
+Atlassian ไม่แนะนำให้ใส่ปุ่มในช่องกรอกเลย ส่วน GitHub Primer, Shopify Polaris, Material และ Microsoft Fluent อนุญาตปุ่มท้ายหนึ่งปุ่ม ให้มีปุ่มเล็กไม่เกินหนึ่งหรือสองปุ่ม
+
+## ส่วนประกอบ
+
+| ส่วน | หน้าที่ |
+| ---- | ------- |
+| **InputGroup** | กรอบและพื้นรอบทั้งหมด มี control หนึ่งตัวกับ addon |
+| **InputGroupInput** | control บรรทัดเดียว props เหมือน Input |
+| **InputGroupTextarea** | control หลายบรรทัด props เหมือน Textarea |
+| **InputGroupAddon** | ช่องข้าง บน หรือล่างของ control สำหรับไอคอน ข้อความ หรือปุ่ม |
+| **InputGroupText** | ข้อความคงที่ใน addon เช่น `$` หรือ `@acme.com` |
+| **InputGroupButton** | ปุ่มเล็กใน addon |
+
+หนึ่งกลุ่มมี control เดียว
+
+## ทำให้โปรแกรมอ่านหน้าจอเข้าใจ
+
+โปรแกรมอ่านหน้าจออ่าน label ของ control ไม่ได้อ่านสิ่งที่อยู่รอบ ๆ ข้อความคงที่และไอคอนใน addon **ไม่ได้** เชื่อมกับช่องโดยอัตโนมัติ
+
+- **ใส่ label ให้ control** ใช้ `<label htmlFor>` ที่มองเห็นได้ชี้ไปที่ `id` ของช่อง หรือ `aria-label` เมื่อไม่มีที่วาง เช่น ช่องค้นหา ไอคอนใน addon ไม่ใช่ label
+- **ข้อความคงที่ที่สำคัญต้องไปถึงช่อง** ใน story `WithText` โปรแกรมอ่านหน้าจอได้ยิน "Work email" แต่ไม่ได้ยิน "@acme.com" เลือกวิธีใดวิธีหนึ่ง
+  - ใส่ความหมายใน label เช่น "Amount, in US dollars" หรือ "Work email, ending @acme.com" แบบที่ GOV.UK ทำ และซ่อนสัญลักษณ์จากโปรแกรมอ่านหน้าจอ
+  - หรือใส่ `id` ให้ InputGroupText แล้วเพิ่มลงใน `aria-describedby` ของช่อง แบบที่ Bootstrap ทำ
+- **ไอคอนเป็นการตกแต่ง** ซ่อนจากโปรแกรมอ่านหน้าจอด้วย `aria-hidden` ตามที่ story ทำ
+- **ไอคอนค้นหาไม่ได้ค้นหา** ผู้ใช้คาดว่าคลิกแว่นขยายแล้วจะค้นหา ให้คู่กับปุ่มที่มี label แบบที่ story `Playground` ใช้ปุ่ม "Go" และให้ Enter ส่งได้ด้วย
+
+TODO: เลือกกฎเดียวสำหรับข้อความคงที่ทั้งผลิตภัณฑ์ ว่าจะใส่ใน label หรือเชื่อมด้วย `aria-describedby`
+
+## การนำเข้าและใช้งาน
+
+ติดตั้งแพ็กเกจ แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
+
+```bash
+npm install lab-package
+```
+
+```tsx
+import "lab-package/styles.css"
+```
+
+จากนั้นนำเข้า component ในไฟล์ที่ใช้
+
+```tsx
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupText,
+  InputGroupTextarea,
+} from "lab-package"
+
+<InputGroup>
+  <InputGroupAddon>
+    <InputGroupText>$</InputGroupText>
+  </InputGroupAddon>
+  <InputGroupInput aria-label="Amount, in US dollars" inputMode="decimal" />
+</InputGroup>
+```
+
+- นำเข้าเฉพาะส่วนที่ใช้
+- InputGroup มี `"use client"` มาในตัว จึงใช้จาก Server Component ได้ ไฟล์ที่ส่งฟังก์ชัน เช่น `onClick` ให้ InputGroupButton ต้องขึ้นต้นด้วย `"use client"`
+- ไอคอนใน story มาจาก `lucide-react` ติดตั้งในแอปก่อนใช้: `npm install lucide-react`
+
+## Props และ variants
+
+InputGroup **ไม่มี prop `variant` หรือ `size`** กลุ่มบรรทัดเดียวสูง 36px รูปแคปซูล เมื่อมี textarea จะสูงตามข้อความและมุมโค้ง 14px เมื่อมี addon ด้านบนหรือล่าง จะเรียงซ้อนและมุมโค้ง 18px
+
+### InputGroup
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `disabled` | `false` | ปิดใช้งาน control และทุกปุ่มข้างใน ทำให้ addon จาง 50% และบอกโปรแกรมอ่านหน้าจอว่ากลุ่มถูกปิดใช้งาน |
+
+control หรือปุ่มยังตั้ง `disabled` ของตัวเองเพื่อทับค่านี้ได้
+
+### InputGroupAddon
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `align` | `inline-start` | `inline-start`: ก่อน control `inline-end`: หลัง control `block-start`: เหนือ control เต็มความกว้าง `block-end`: ใต้ control เต็มความกว้าง |
+
+คลิก addon นอกปุ่มจะย้ายโฟกัสไปที่ช่อง ช่วยได้เพราะ GOV.UK พบว่าคนคลิกที่ข้อความนำหน้า TODO: เมื่อเป็น textarea การคลิก addon ไม่ย้ายโฟกัส ต้องยืนยันว่าควรย้ายหรือไม่
+
+TODO: story วาดเส้นแบ่งระหว่าง addon ด้านบนหรือล่างกับ textarea ด้วยคลาส ไม่ใช่ prop ตัดสินใจว่าจะทำเป็น prop หรือไม่
+
+### InputGroupButton
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `variant` | `ghost` | variant ใดก็ได้ของ Button story ใช้ `ghost`, `secondary` และ `primary` |
+| `size` | `xs` | `xs` (24px) หรือ `sm` (32px) ขนาดใหญ่กว่านี้ไม่พอดีกับกลุ่ม |
+| `iconOnly` | `false` | ปุ่มไอคอนสี่เหลี่ยม **ต้องใส่ `aria-label`** ที่บอกการกระทำ เช่น "Copy link" |
+| `type` | `button` | ใส่ `type="submit"` เฉพาะเมื่อปุ่มส่งฟอร์ม |
+| `disabled` | `false` | ปิดใช้งานปุ่ม |
+
+- **ขนาด:** `xs` เท่ากับพื้นที่กดขั้นต่ำ 24px ของ WCAG พอดี ให้เว้นระยะระหว่างปุ่ม `xs` บนจอสัมผัสควรใช้ `sm`
+- **ปุ่มคัดลอก:** ยืนยันการคัดลอกด้วยข้อความที่โปรแกรมอ่านหน้าจอประกาศ เช่น "Link copied" ในข้อความสถานะ TODO: ยังไม่มีแนวทางสำหรับเรื่องนี้
+- **ปุ่มแสดง/ซ่อนรหัสผ่าน:** เปลี่ยน label ของปุ่มระหว่าง "Show password" และ "Hide password" และประกาศการเปลี่ยนแปลง TODO: ยังไม่มี story หรือแนวทาง
+
+### InputGroupInput และ InputGroupTextarea
+
+ใช้ props เหมือน Input และ Textarea รวมถึง `invalid`, `disabled`, `readOnly` และ `placeholder` ขอบ พื้น และวงของตัวเองถูกเอาออก กลุ่มเป็นผู้วาดแทน control แบบ read-only ในกลุ่มยังคงกรอบของกลุ่ม เหมาะกับช่องคัดลอกลิงก์
+
+### กล่องข้อความที่มีแถบเครื่องมือ
+
+story `WithTextarea` เป็นกล่องเขียนข้อความ มีหัวข้อด้านบน และปุ่มแนบไฟล์กับปุ่มส่งด้านล่าง
+- ใส่ label ให้ textarea เอง หัวข้อด้านบนไม่ใช่ label ในตัวมันเอง story ใช้ `aria-label`
+- ใส่ `aria-label` ให้ปุ่มไอคอนทั้งสอง
+- TODO: ยังไม่มีกฎว่า Enter ส่งข้อความและ Shift+Enter ขึ้นบรรทัดใหม่หรือไม่ ไม่มีมาตรฐานกำหนด ถ้า Enter ส่ง ต้องไม่ทำงานขณะผู้ใช้ยังพิมพ์ด้วยแป้นภาษาญี่ปุ่น จีน หรือเกาหลีที่ยังไม่ยืนยันตัวอักษร
+
+### สถานะ
+
+| สถานะ | เกิดเมื่อ | หน้าตา |
+| ----- | --------- | ------ |
+| Focus | โฟกัส control ด้วยคีย์บอร์ด | ทั้งกลุ่มได้ขอบโฟกัสเข้มและวงจาง 3px |
+| Invalid | `invalid` บน control | ทั้งกลุ่มได้ขอบแดงและวงแดงจาง |
+| Disabled | `disabled` บนกลุ่ม | addon จาง 50% control และปุ่มจาง 50% และใช้ไม่ได้ |
+
+- **Invalid:** ขอบแดงอย่างเดียวไม่พอ ต้องมีข้อความผิดพลาด และเชื่อมด้วย `aria-describedby` ของ control ดูคู่มือของ Input
+- **Disabled:** ข้อความ addon ที่จางลงต่ำกว่า 4.5:1 โดยตั้งใจ WCAG ไม่กำหนดความต่างของสีสำหรับ control ที่ปิดใช้งาน และถ้าชัดเต็มที่จะดูเหมือนใช้งานได้
+- **กรอบจาง:** ขอบของกลุ่มอยู่ที่ 1.23:1 เทียบกับหน้าสีขาว ถ้ามี label ที่มองเห็นได้ถือว่ารับได้ ถ้าไม่มี เช่น ช่องค้นหาที่มีแค่ `aria-label` อาจไม่ผ่าน WCAG 1.4.11 ให้มี label ที่มองเห็นได้เมื่อทำได้ TODO: ตัดสินใจว่าจะทำขอบ `--input` ให้เข้มขึ้นหรือไม่
+
+โปรแกรมอ่านหน้าจอมองทั้ง InputGroup เป็นกลุ่มเดียว addon ไม่สร้างกลุ่มของตัวเอง ตั้งชื่อกลุ่มด้วย `aria-label` ได้เมื่อมีความหมายมากกว่าหนึ่งอย่าง แต่ปกติ label ของ control ก็พอ
+
+โหมดมืดทำงานอัตโนมัติเมื่อมีคลาส `.dark` บน element ที่ครอบอยู่
+
+### ความต่างของสี
+
+| อะไร | สว่าง | มืด | ต้องได้ |
+| ---- | ----- | --- | ------- |
+| ข้อความและไอคอนใน addon | 4.96 | 7.73 | 4.5 |
+| ขอบโฟกัสเทียบกับหน้า | 5.25 | 4.60 | 3 |
+| ขอบกลุ่มเทียบกับหน้า | 1.23 | 1.48 | 3 ดูด้านบน |
+
+## Tokens ที่ใช้
+
+| Token | ใช้สำหรับ |
+| ----- | --------- |
+| `--input` | ขอบกลุ่ม และพื้นที่ 30% |
+| `--muted-foreground` | ข้อความและไอคอนใน addon และ placeholder |
+| `--ring` | ขอบโฟกัสและวงโฟกัส |
+| `--destructive` | ขอบและวงตอน invalid |
+| `--radius` | มุม: 2.6 × `--radius` (แคปซูล) สำหรับบรรทัดเดียว 1.4 × เมื่อมี textarea 1.8 × เมื่อมี addon ด้านบนหรือล่าง |
+
+ปุ่มในกลุ่มใช้ token ของ Button
+
+## ตัวอย่าง
+
+จาก story `Playground` เขียนด้วยค่าเริ่มต้น
+
+<Canvas of={InputGroupStories.Playground} />
+
+```tsx
+import { SearchIcon } from "lucide-react"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "lab-package"
+
+<InputGroup>
+  <InputGroupAddon>
+    <SearchIcon aria-hidden />
+  </InputGroupAddon>
+  <InputGroupInput aria-label="Search transactions" placeholder="Search" />
+  <InputGroupAddon align="inline-end">
+    <InputGroupButton>Go</InputGroupButton>
+  </InputGroupAddon>
+</InputGroup>
+```
+
+ไอคอนถูกซ่อนจากโปรแกรมอ่านหน้าจอ ช่องมี label และปุ่ม "Go" ใช้ค้นหา

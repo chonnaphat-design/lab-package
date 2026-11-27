@@ -45,14 +45,15 @@
     @apply border-destructive;
   }
 
+  /* Hover only on links, like the other variants: a plain label must not look clickable. */
   .root[data-variant="ghost"] {
-    @apply hover:bg-muted hover:text-muted-foreground;
+    @apply [a]:hover:bg-muted [a]:hover:text-muted-foreground;
   }
   :global(.dark) .root[data-variant="ghost"] {
-    @apply hover:bg-muted/50;
+    @apply [a]:hover:bg-muted/50;
   }
 
   .root[data-variant="link"] {
-    @apply text-link underline-offset-4 hover:underline;
+    @apply text-link underline-offset-4 [a]:hover:underline;
   }
 }
