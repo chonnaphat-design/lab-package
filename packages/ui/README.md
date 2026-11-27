@@ -2,7 +2,7 @@
 
 React design system components (built in the week-1-lab app): shadcn/ui converted to Base UI primitives, styled with CSS Modules over OKLCH design tokens.
 
-Components: `Accordion` (+ parts), `AlertDialog` (+ parts), `Badge`, `Button`, `Dialog` (+ parts), `Input`, `InputGroup` (+ parts), `InputOTP` (+ parts), `Textarea`.
+Components: `Accordion` (+ parts), `AlertDialog` (+ parts), `Attachment` (+ parts), `Avatar` (+ parts), `Badge`, `Button`, `Card` (+ parts), `Chart` (+ parts), `Checkbox`, `Dialog` (+ parts), `Input`, `InputGroup` (+ parts), `InputOTP` (+ parts), `Table` (+ parts), `Textarea`.
 
 ## Use
 
@@ -10,7 +10,7 @@ Components: `Accordion` (+ parts), `AlertDialog` (+ parts), `Badge`, `Button`, `
 npm install lab-package
 ```
 
-Peer dependencies: `react` and `react-dom` 19.
+Peer dependencies: `react` and `react-dom` 19. To use `Chart`, also install `recharts` 3 (`npm install recharts`): you build charts from its parts, and the app must have exactly one copy. The data-table recipe in the `Table` docs (sorting, filtering, selection, pagination) uses `@tanstack/react-table` 8, which you install in your app; the package itself does not depend on it.
 
 Import the stylesheet once, at the root of the app (in Next.js, `app/layout.tsx`), then import components:
 
@@ -34,13 +34,13 @@ What the app must provide:
 
 - **A CSS reset.** Components assume Tailwind v4's preflight (`@import "tailwindcss"`), as in the original app.
 - **`.dark` on an ancestor** for dark mode (e.g. `next-themes` with `attribute="class"`).
-- **`--font-heading`** on an ancestor. `DialogTitle` and `AlertDialogTitle` use it. Other text inherits the app's font.
+- **`--font-heading`** on an ancestor. `DialogTitle`, `AlertDialogTitle` and `CardTitle` use it. Other text inherits the app's font.
 
 **Overrides:** a Tailwind utility passed through `className` beats the component's own styles without `!important`, because utilities live in a later layer. To retheme, redefine a token on `:root` / `.dark` after importing the stylesheet.
 
 ### Server components
 
-`AlertDialog`, `Dialog`, `InputGroup` and `InputOTP` ship with `"use client"`. `Accordion`, `Badge`, `Button`, `Input` and `Textarea` have no directive, matching their source.
+`AlertDialog`, `Attachment`, `Avatar`, `Chart`, `Checkbox`, `Dialog`, `InputGroup`, `InputOTP` and `Table` ship with `"use client"`. `Accordion`, `Badge`, `Button`, `Card`, `Input` and `Textarea` have no directive, matching their source.
 
 ## Develop
 

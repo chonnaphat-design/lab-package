@@ -1,0 +1,227 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks"
+
+import * as ChartStories from "./Chart.stories"
+
+<Meta of={ChartStories} name="คู่มือการใช้งาน" />
+
+# Chart
+
+**วัตถุประสงค์:** กราฟแท่ง เส้น และพื้นที่ ที่สร้างจาก Recharts จัดสไตล์ด้วย token ของเรา พร้อม tooltip และคำอธิบายสีที่เข้าชุดกัน
+
+## ควรใช้เมื่อ
+
+- แนวโน้มตามเวลา เช่น ยอดเงินแต่ละเดือน: กราฟเส้น
+- เปรียบเทียบจำนวนระหว่างไม่กี่หมวดหรือช่วงเวลา เช่น รายรับและรายจ่ายแต่ละเดือน: กราฟแท่ง
+- ยอดรวมที่สะสมขึ้นตามเวลา: กราฟพื้นที่แบบซ้อน
+
+## ไม่ควรใช้เมื่อ
+
+| แทนที่จะใช้กราฟกับ… | ให้ใช้ |
+| ------------------- | ------ |
+| ค่าที่แน่นอนที่ผู้ใช้ต้องอ่านหรือคัดลอก | ตาราง |
+| ตัวเลขเดียว เช่น ยอดใช้จ่ายเดือนนี้ | ตัวเลขเป็นข้อความ พร้อมการเปลี่ยนแปลง |
+| ส่วนของทั้งหมดที่มีมากกว่าห้าส่วน | กราฟแท่งที่เรียงลำดับแล้ว กราฟวงกลมหรือโดนัทใช้ไม่เกินห้าชิ้นที่รวมกันได้ทั้งหมดที่มีความหมาย |
+| ค่าที่ขนาดต่างกันมาก | ตาราง |
+| การตกแต่ง | ไม่ต้องใช้ ไม่ใช้ 3D เงา หรือแกนที่สอง |
+
+**เขียนข้อความหลักก่อน** แล้วจึงเลือกกราฟที่แสดงข้อความนั้น
+
+## การเขียนเนื้อหา
+
+- **หัวข้อ:** บอกข้อสรุป เช่น "Spending stayed below income every month" ไม่ใช่แค่ "Income and spending" ตามที่ Analysis Function ของรัฐบาลอังกฤษแนะนำ
+- **หัวข้อรอง:** วัดอะไร หน่วยอะไร ช่วงเวลาไหน เช่น "AUD, January to June 2026"
+- **ตัวเลข:** มีตัวคั่นหลักพัน ทศนิยมสม่ำเสมอ และหน่วยในหัวข้อ แกน หรือ tooltip
+- **ชื่อชุดข้อมูล:** สั้น ๆ ตั้งเป็น `label` ใน config จะแสดงใน tooltip และคำอธิบายสี
+
+## ส่วนประกอบ
+
+| ส่วน | หน้าที่ |
+| ---- | ------- |
+| **ChartContainer** | กำหนดขนาดกราฟ (16:9 เป็นค่าเริ่มต้น) จัดสไตล์ส่วนต่าง ๆ ของ Recharts และกำหนดสีหนึ่งสีต่อชุดข้อมูล |
+| ส่วนของ Recharts | ตัวกราฟ เช่น `BarChart`, `Bar`, `XAxis` และ `CartesianGrid` นำเข้าจาก `recharts` |
+| **ChartTooltip** | tooltip ของ Recharts ส่ง `content={<ChartTooltipContent />}` |
+| **ChartTooltipContent** | หน้าตาของ tooltip: ชุดข้อมูล เครื่องหมายสี และค่า |
+| **ChartLegend** | คำอธิบายสีของ Recharts ส่ง `content={<ChartLegendContent />}` |
+| **ChartLegendContent** | หน้าตาของคำอธิบายสี: สี่เหลี่ยมสีและชื่อของแต่ละชุด |
+
+## การนำเข้าและใช้งาน
+
+ติดตั้งแพ็กเกจ **และ Recharts** แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
+
+```bash
+npm install lab-package recharts
+```
+
+```tsx
+import "lab-package/styles.css"
+```
+
+จากนั้นนำเข้าส่วนของกราฟจาก `lab-package` และตัวกราฟจาก `recharts`
+
+```tsx
+"use client"
+
+import { Bar, BarChart, XAxis } from "recharts"
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "lab-package"
+
+const config = {
+  income: { label: "Income", color: "var(--chart-2)" },
+} satisfies ChartConfig
+
+<ChartContainer config={config}>
+  <BarChart accessibilityLayer data={data}>
+    <XAxis dataKey="month" />
+    <ChartTooltip content={<ChartTooltipContent />} />
+    <ChartLegend content={<ChartLegendContent />} />
+    <Bar dataKey="income" fill="var(--color-income)" />
+  </BarChart>
+</ChartContainer>
+```
+
+- **Recharts เป็น peer dependency** แอปของคุณติดตั้งเอง จึงมีเพียงชุดเดียว ถ้ามีสองชุด กราฟจะทำงานผิด
+- Chart มี `"use client"` มาในตัว Recharts ทำงานในเบราว์เซอร์เท่านั้น ไฟล์ที่สร้างกราฟจึงต้องขึ้นต้นด้วย `"use client"` ด้วย
+- แต่ละชุดข้อมูลได้ตัวแปร CSS ตามชื่อ key: `income` กลายเป็น `var(--color-income)`
+
+## ทำให้เข้าถึงได้
+
+กราฟคือรูปภาพ สิ่งที่ทำให้เข้าถึงได้ส่วนใหญ่อยู่รอบ ๆ กราฟ
+
+- **ใส่ไว้ใน figure พร้อมคำบรรยาย** ที่บอกหัวข้อและข้อสรุป ตามที่ทุก story ใช้ `<figure>` และ `<figcaption>` W3C แนะนำแบบนี้
+- **ให้ดูข้อมูลเป็นตารางได้** ข้างกราฟ หรือหลังปุ่ม "Show as table" Chartability จัดการไม่มีตารางเป็นปัญหาร้ายแรง TODO: ยังไม่มีมุมมองตารางในตัว
+- **เปิด `accessibilityLayer`** บนกราฟของ Recharts (เปิดเป็นค่าเริ่มต้นใน Recharts 3) แล้ว
+  - **Tab** โฟกัสกราฟ พร้อมวงโฟกัส
+  - **ลูกศรซ้ายขวา** ย้ายระหว่างจุด
+  - **Enter** เปิดปิด tooltip และ **Esc** ซ่อน tooltip
+  - tooltip เป็น live region โปรแกรมอ่านหน้าจอจึงอ่านค่าของแต่ละจุดขณะเลื่อน
+- **Esc** ใช้ได้เพราะการแก้ของเรา Recharts ไม่มีการจัดการ Escape แต่ WCAG 1.4.13 ต้องการ การขยับเมาส์หรือกดปุ่มอื่นจะแสดง tooltip กลับมา
+- **อย่าพึ่งสีอย่างเดียว** ตั้งชื่อชุดข้อมูลในคำอธิบายสีและ tooltip ติดป้ายเส้นโดยตรงเมื่อทำได้ และไม่เกินห้าชุด
+- **การเคลื่อนไหว:** แอนิเมชันตอนเปิดของ Recharts หยุดเองเมื่อผู้ใช้ตั้งค่าลดการเคลื่อนไหว
+
+## Props และ variants
+
+### ChartContainer
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `config` | จำเป็น | หนึ่งรายการต่อ key ของชุดข้อมูล: `label` และ `color` หรือ `theme: { light, dark }` และ `icon` (ไม่บังคับ) |
+| `className` | ไม่มี | ขนาดและสัดส่วน ค่าเริ่มต้นคือ 16:9 ตั้งสัดส่วนหรือความสูงอื่นได้ที่นี่ |
+| `initialDimension` | `320 × 200` | ขนาดที่ใช้ก่อนวัดขนาดจริงของกรอบ |
+| `id` | สร้างให้ | id คงที่สำหรับสไตล์สีของกราฟ |
+
+ใช้ `theme: { light, dark }` เมื่อสีที่ใช้ได้บนหน้าสว่างใช้ไม่ได้บนหน้ามืด ตามที่ story ใช้กับ "Spending"
+
+### ChartTooltipContent
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `indicator` | `dot` | เครื่องหมายสี: `dot`, `line` หรือ `dashed` |
+| `hideLabel` | `false` | ซ่อนหัวข้อ เช่น ชื่อเดือน |
+| `hideIndicator` | `false` | ซ่อนเครื่องหมายสี |
+| `labelFormatter`, `formatter` | ไม่มี | จัดรูปแบบหัวข้อหรือค่าเอง เช่น เติม "$" |
+| `nameKey`, `labelKey` | ไม่มี | ฟิลด์ข้อมูลไหนเป็นชื่อหรือหัวข้อ |
+
+ค่าแสดงตามรูปแบบตัวเลขของเบราว์เซอร์ ด้วยตัวเลขความกว้างเท่ากัน
+
+### ChartLegendContent
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `hideIcon` | `false` | แสดงสี่เหลี่ยมสีแม้ชุดข้อมูลจะมีไอคอน |
+| `nameKey` | ไม่มี | ฟิลด์ข้อมูลไหนเป็นป้ายชื่อ |
+
+คำอธิบายสีอยู่ใต้กราฟ ไม่ต้องใส่เมื่อมีชุดข้อมูลเดียว เพราะหัวข้อบอกอยู่แล้ว TODO: เครื่องหมายเป็นสี่เหลี่ยมเสมอ แม้เป็นกราฟเส้น Microsoft แนะนำให้ตรงกับรูปทรงของข้อมูล
+
+### แกนและเส้นตาราง
+
+- **กราฟแท่งและกราฟพื้นที่เริ่มที่ศูนย์** กราฟเส้นเริ่มที่อื่นได้ แต่ต้องบอก
+- เส้นตารางจางและเป็นแนวนอนเท่านั้นใน story ไม่ควรเกินประมาณสิบเส้น
+- **ป้ายแกนเป็นสีข้อความรองเสมอ** Recharts ตั้งสีแบบ inline stylesheet จึงบังคับด้วย `!important` การเปลี่ยนสีผ่าน prop `tick` ของ Recharts จะไม่ได้ผล
+
+### สี
+
+token กราฟทั้งห้าเป็นเฉดของสีเทามะกอกสีเดียว ไม่ใช่สีที่ต่างกัน
+
+| Token | เทียบกับหน้าสว่าง | เทียบกับหน้ามืด |
+| ----- | ----------------- | --------------- |
+| `--chart-1` | 1.43 ✗ | 13.67 |
+| `--chart-2` | 4.25 | 4.60 |
+| `--chart-3` | 6.90 | 2.84 ✗ |
+| `--chart-4` | 9.42 | 2.08 ✗ |
+| `--chart-5` | 14.27 | 1.37 ✗ |
+
+ข้อมูลในกราฟต้องได้ 3:1 เทียบกับหน้า (WCAG 1.4.11) เว้นแต่ค่าจะแสดงเป็นข้อความหรือในตารางด้วย
+
+- **ชุดเดียว:** ใช้ `--chart-2` ผ่านทั้งสองธีม
+- **สองชุด:** `--chart-2` คู่กับ `theme: { light: "var(--chart-4)", dark: "var(--chart-1)" }` ตามที่ story ทำ
+- **มากกว่านั้น:** เฉดที่อยู่ติดกันต่างกันแค่ 1.37:1 ถึง 2.97:1 ใกล้เกินกว่าจะแยกได้ IBM Carbon, Atlassian และ Office for National Statistics ของอังกฤษใช้สีที่ต่างกันสำหรับหมวดหมู่ เฉดสีเดียวใช้สำหรับข้อมูลที่มีลำดับ เช่น ต่ำไปสูง TODO: ตัดสินใจว่าจะเพิ่มชุดสีสำหรับหมวดหมู่หรือไม่
+
+โหมดมืดทำงานอัตโนมัติเมื่อมีคลาส `.dark` บน element ที่ครอบอยู่
+
+## ความต่างของสี
+
+| อะไร | สว่าง | มืด | ต้องได้ |
+| ---- | ----- | --- | ------- |
+| ป้ายแกน | 5.27 | 8.43 | 4.5 |
+| วงโฟกัสรอบกราฟ | 5.25 | 4.60 | 3 |
+| ชุดข้อมูลใน story เทียบกับหน้า | 4.25 และ 9.42 | 4.60 และ 13.67 | 3 |
+
+axe (WCAG 2.2 AA) ผ่านทุก story แต่ axe ไม่ได้ตรวจข้อมูลในกราฟ
+
+## Tokens ที่ใช้
+
+| Token | ใช้สำหรับ |
+| ----- | --------- |
+| `--chart-1` ถึง `--chart-5` | สีของชุดข้อมูล ตั้งใน `config` |
+| `--muted-foreground` | ป้ายแกน และชื่อชุดข้อมูลใน tooltip |
+| `--border` | เส้นตาราง (50%) เส้นชี้ของ tooltip และขอบ tooltip |
+| `--muted` | แถบไฮไลต์ตอนชี้ในกราฟแท่ง |
+| `--background` | พื้นหลัง tooltip |
+| `--foreground` | ค่าใน tooltip |
+| `--ring` | วงโฟกัสรอบกราฟ |
+
+## ตัวอย่าง
+
+จาก story `Playground` โดยไม่มี figure และคำบรรยาย
+
+<Canvas of={ChartStories.Playground} />
+
+```tsx
+"use client"
+
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "lab-package"
+
+const config = {
+  income: { label: "Income", color: "var(--chart-2)" },
+  spending: {
+    label: "Spending",
+    theme: { light: "var(--chart-4)", dark: "var(--chart-1)" },
+  },
+} satisfies ChartConfig
+
+<ChartContainer config={config}>
+  <BarChart accessibilityLayer data={monthly}>
+    <CartesianGrid vertical={false} />
+    <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
+    <YAxis tickLine={false} axisLine={false} width={56} tickFormatter={dollars} />
+    <ChartTooltip content={<ChartTooltipContent />} />
+    <ChartLegend content={<ChartLegendContent />} />
+    <Bar dataKey="income" fill="var(--color-income)" radius={4} />
+    <Bar dataKey="spending" fill="var(--color-spending)" radius={4} />
+  </BarChart>
+</ChartContainer>
+```
