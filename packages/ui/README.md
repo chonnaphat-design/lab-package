@@ -2,7 +2,7 @@
 
 React design system components (built in the week-1-lab app): shadcn/ui converted to Base UI primitives, styled with CSS Modules over OKLCH design tokens.
 
-Components: `AlertDialog` (+ parts), `Badge`, `Button`, `Dialog` (+ parts), `Input`, `InputGroup` (+ parts), `InputOTP` (+ parts), `Textarea`.
+Components: `Accordion` (+ parts), `AlertDialog` (+ parts), `Badge`, `Button`, `Dialog` (+ parts), `Input`, `InputGroup` (+ parts), `InputOTP` (+ parts), `Textarea`.
 
 ## Use
 
@@ -40,7 +40,7 @@ What the app must provide:
 
 ### Server components
 
-`AlertDialog`, `Dialog`, `InputGroup` and `InputOTP` ship with `"use client"`. `Badge`, `Button`, `Input` and `Textarea` have no directive, matching their source.
+`AlertDialog`, `Dialog`, `InputGroup` and `InputOTP` ship with `"use client"`. `Accordion`, `Badge`, `Button`, `Input` and `Textarea` have no directive, matching their source.
 
 ## Develop
 

@@ -61,6 +61,21 @@ The English `<Name>.md` is the source of truth. `<Name>.mdx` beside it is the sa
 - A change to the consumer contract (install, stylesheet, `--font-heading`, `.dark`) or to the token list also updates `Introduction.mdx`.
 - Never leave a `.md` change without its `.mdx` counterpart. If you can't translate it, stop and ask.
 
+## Adding a component
+
+Components come from shadcn's **`base-maia`** style (Base UI, `olive` base colour), the style the week-1-lab app was set up with. Get the source from `https://ui.shadcn.com/r/styles/base-maia/<name>.json`. Its `files[].content` is the TSX with Tailwind classes inline and icons as `IconPlaceholder` (use the `lucide` name).
+
+Then, in one change:
+
+1. **Convert** it to `packages/ui/src/components/<Name>/`: `<Name>.tsx` with no style classes, every class moved into `<Name>.module.css` (see [Component anatomy](#component-anatomy)), and `index.ts` exporting the parts. Keep shadcn's `data-slot` names. Add `"use client"` only if the source has it or the TSX uses hooks.
+2. **Check it against the Base UI API** (`node_modules/@base-ui/react/<name>/`) rather than trusting shadcn's classes; fix anything that doesn't work with Base UI, and say what you changed and why in a CSS comment.
+3. **Give it the shared focus ring** (`focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50`) on anything focusable, if shadcn left it out.
+4. **Export it** from `src/index.ts` (alphabetical), and add it to `packages/ui/README.md` (component list and the `"use client"` sentence) and to the component table in `packages/ui/src/Introduction.mdx`.
+5. **Stories**: `<Name>.stories.tsx` following the Storybook rules below.
+6. **Docs**: `<Name>.md` and its Thai `<Name>.mdx`, per [Component docs](#component-docs).
+7. **If it ships `"use client"`**, add it to the list in [Checks after a change](#checks-after-a-change).
+8. **Verify** in Storybook: keyboard (Tab, Enter/Space), focus ring, states, dark mode, and axe; then run the checks.
+
 ## Component anatomy
 
 - **TSX has no style classes and no `cva`.** It sets `className={cn(styles.root, className)}` and exposes variants as `data-variant` / `data-size` / boolean `data-*` attributes. Keep shadcn's `data-slot` attributes, because other components' CSS targets them.
@@ -83,6 +98,7 @@ The English `<Name>.md` is the source of truth. `<Name>.mdx` beside it is the sa
 - **Group selectors:** use a descendant selector on the parent's class (`.root[data-disabled="true"] .addon`) instead of `group/name` + `group-*`.
 - **Utility classes in selectors:** reference them as `:global(.border-b)`.
 - **Containers:** use an unnamed `@container`. CSS custom properties are not renamed.
+- **Height animations (Accordion, Collapsible):** `tw-animate-css`'s `animate-accordion-*` / `animate-collapsible-*` keyframes read Radix's height variables, so with Base UI they jump instead of animating. Transition `height` from Base UI's `--accordion-panel-height` (or `--collapsible-panel-height`) and set `h-0` on `[data-starting-style]` / `[data-ending-style]`, as `Accordion.module.css` does.
 - **Restyling an embedded component** (InputGroup → Button/Input): scope under the parent (`.root .button[data-slot="button"]`) or key the state on `data-slot` in the child's own module, so the result does not depend on CSS load order.
 
 ## Storybook

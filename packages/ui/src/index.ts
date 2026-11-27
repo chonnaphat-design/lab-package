@@ -1,6 +1,7 @@
 // Library stylesheet: tokens go into dist/styles.css alongside the component modules.
 import "./styles/tokens.css"
 
+export * from "./components/Accordion"
 export * from "./components/AlertDialog"
 export * from "./components/Badge"
 export * from "./components/Button"

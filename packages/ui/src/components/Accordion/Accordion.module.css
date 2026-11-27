@@ -1,0 +1,58 @@
+@reference "../../styles/reference.css";
+
+/* Keep Tailwind's layer order even if this file loads before globals.css. */
+@layer theme, base, components, utilities;
+
+@layer components {
+  .root {
+    @apply flex w-full flex-col overflow-hidden rounded-2xl border;
+  }
+
+  .item {
+    @apply not-last:border-b data-open:bg-muted/50;
+  }
+
+  .header {
+    @apply flex;
+  }
+
+  .trigger {
+    @apply relative flex flex-1 items-start justify-between gap-6 border border-transparent p-4 text-left text-sm font-medium transition-all outline-none hover:underline;
+    /*
+     * shadcn's trigger has no focus style. Same ring as the other components,
+     * drawn inside the button so the root's rounded overflow doesn't clip it.
+     */
+    @apply focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:ring-inset;
+    @apply aria-disabled:pointer-events-none aria-disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50;
+  }
+
+  .icon {
+    @apply pointer-events-none ml-auto size-4 shrink-0 text-muted-foreground;
+  }
+
+  /* Chevron down while closed, up while open. */
+  .trigger[aria-expanded="true"] .iconClosed,
+  .trigger:not([aria-expanded="true"]) .iconOpen {
+    @apply hidden;
+  }
+
+  /*
+   * Base UI measures the panel into --accordion-panel-height and marks the start
+   * and end of the transition. (tw-animate-css's accordion keyframes read Radix's
+   * variable instead, so they don't animate with Base UI.)
+   */
+  .content {
+    @apply overflow-hidden px-4 text-sm;
+    height: var(--accordion-panel-height);
+    @apply motion-safe:transition-[height] motion-safe:duration-200 motion-safe:ease-out;
+  }
+
+  .content[data-starting-style],
+  .content[data-ending-style] {
+    @apply h-0;
+  }
+
+  .contentInner {
+    @apply pt-0 pb-4 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4;
+  }
+}
