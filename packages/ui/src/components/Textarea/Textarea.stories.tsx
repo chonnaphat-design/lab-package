@@ -51,11 +51,24 @@ export const WithLabel: Story = {
   ),
 }
 
+/** `rows` sets the starting height, to hint at how long an answer you expect. It still grows, up to a cap, then scrolls. */
+export const LongAnswer: Story = {
+  render: (args) => (
+    <div className="grid gap-2">
+      <label htmlFor="textarea-problem" className="text-sm font-medium">
+        Describe the problem
+      </label>
+      <Textarea {...args} id="textarea-problem" aria-label={undefined} placeholder={undefined} rows={6} />
+    </div>
+  ),
+}
+
 const states = [
   { name: "Empty", props: { placeholder: "Add a note…" } },
   { name: "Filled", props: { defaultValue: "Invoice #4821, paid in full." } },
   { name: "Invalid", props: { defaultValue: "Too long", invalid: true } },
   { name: "Disabled", props: { placeholder: "Disabled", disabled: true } },
+  { name: "Read-only", props: { defaultValue: "Invoice #4821, paid in full.", readOnly: true } },
 ]
 
 /** Every state side by side. Focus is checked by tabbing into a field. */

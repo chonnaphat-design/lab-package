@@ -138,7 +138,7 @@ Every color and radius comes from `src/styles/tokens.css` (the `--color-*` mappi
 | `--muted`                | `oklch(0.966 0.005 106.5)`   | `oklch(0.286 0.016 107.4)`   | ghost hover, expanded                          |
 | `--destructive`          | `oklch(0.48 0.2 27.325)`     | `oklch(0.704 0.191 22.216)`  | danger text, tint, invalid state               |
 | `--link`                 | `oklch(0.5 0.15 131)`        | `oklch(0.768 0.233 130.85)`  | link text                                      |
-| `--ring`                 | `oklch(0.737 0.021 106.9)`   | `oklch(0.58 0.031 107.3)`    | focus border and ring                          |
+| `--ring`                 | `oklch(0.53 0.021 106.9)`    | `oklch(0.58 0.031 107.3)`    | focus border and ring                          |
 | `--radius`               | `0.625rem`                   | —                            | `rounded-4xl` = `--radius × 2.6` = 26px (pill) |
 
 `--link` exists because lime `--primary` works as a fill but reads at only 1.5:1 as text on white; in dark mode it is the same lime as `--primary`.

@@ -5,6 +5,10 @@ import "./preview.css"
 
 const preview: Preview = {
   parameters: {
+    options: {
+      // Thai introduction first, then components.
+      storySort: { order: ["แนะนำ", "Components", ["*", ["คู่มือการใช้งาน", "Docs", "*"]]] },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
