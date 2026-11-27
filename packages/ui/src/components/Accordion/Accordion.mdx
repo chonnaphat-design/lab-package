@@ -1,0 +1,198 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks"
+
+import * as AccordionStories from "./Accordion.stories"
+
+<Meta of={AccordionStories} name="คู่มือการใช้งาน" />
+
+# Accordion
+
+**วัตถุประสงค์:** หัวข้อเรียงกันเป็นรายการ แต่ละหัวข้อเปิดเพื่อแสดงเนื้อหาของส่วนนั้น ผู้ใช้จึงเลือกเปิดเฉพาะไม่กี่ส่วนที่ต้องการจากหลาย ๆ ส่วน
+
+## ควรใช้เมื่อ
+
+- ส่วนที่เป็นอิสระต่อกัน ซึ่งคนส่วนใหญ่ต้องการแค่หนึ่งหรือสองส่วน เช่น คำถามที่พบบ่อย
+- ภาพรวมของหลายส่วนที่เกี่ยวข้องกัน ซึ่งหัวข้ออย่างเดียวก็ช่วยให้หาทางได้
+- ข้อมูลแน่นบนจอเล็ก หรือสำหรับผู้ใช้ประจำที่ทำงานคุ้นเคย
+
+## ไม่ควรใช้เมื่อ
+
+| แทนที่จะใช้ accordion กับ… | ให้ใช้ |
+| -------------------------- | ------ |
+| เนื้อหาที่ทุกคนหรือคนส่วนใหญ่ต้องการ หรืออ่านต่อเนื่องตั้งแต่ต้นจนจบ | แสดงทั้งหมดพร้อมหัวข้อ หน้ายาวไม่เป็นไรถ้าเนื้อหาเกี่ยวข้อง |
+| หน้าสั้น | เนื้อหาธรรมดา |
+| เนื้อหาที่คนเปรียบเทียบข้ามส่วน | แสดงแบบเปิดเทียบกัน แหล่งอ้างอิงเห็นต่างกัน: GOV.UK อนุญาตให้ใช้ accordion เพื่อเปรียบเทียบ ส่วน Nielsen Norman Group ไม่แนะนำ |
+| ข้อมูลที่ต้องใช้เพื่อทำงานปัจจุบันให้เสร็จ เช่น ช่องกรอกในฟอร์ม | แสดงในหน้า เพราะข้อผิดพลาดอาจถูกซ่อนในส่วนที่ปิดอยู่ |
+| ข้อมูลที่ซ้อนกันหลายชั้น | หน้าแยก หรือ tree ห้ามใส่ accordion ไว้ใน accordion |
+| มุมมองไม่กี่แบบของสิ่งเดียวกันที่สลับไปมา | TODO: ยังไม่มี Tabs |
+
+## การเขียนหัวข้อ
+
+- **สั้น เจาะจง ตัวพิมพ์แบบประโยค ไม่มีจุดท้าย** เช่น "How long do transfers take?" หรือ "Fees and limits"
+- **บอกสิ่งที่อยู่ข้างใน** หัวข้อคือสิ่งเดียวที่ผู้ใช้เห็นก่อนตัดสินใจเปิด
+- **ไม่มีอะไรให้กดในหัวข้อ** ห้ามใส่ลิงก์หรือปุ่มใน trigger ทั้งแถวหัวข้อคือปุ่มอยู่แล้ว
+
+## ส่วนประกอบ
+
+| ส่วน | หน้าที่ |
+| ---- | ------- |
+| **Accordion** | กรอบรอบทุกรายการ เก็บว่ารายการไหนเปิดอยู่ |
+| **AccordionItem** | หนึ่งส่วน: หัวข้อและแผงเนื้อหา ต้องมี `value` ไม่ซ้ำกัน |
+| **AccordionTrigger** | หัวข้อและปุ่มเปิดปิดส่วนนั้น พร้อมไอคอนลูกศร |
+| **AccordionContent** | แผงเนื้อหาที่แสดงเมื่อเปิด |
+
+## การนำเข้าและใช้งาน
+
+ติดตั้งแพ็กเกจ แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
+
+```bash
+npm install lab-package
+```
+
+```tsx
+import "lab-package/styles.css"
+```
+
+จากนั้นนำเข้า component ในไฟล์ที่ใช้
+
+```tsx
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "lab-package"
+
+<Accordion>
+  <AccordionItem value="transfers">
+    <AccordionTrigger>How long do transfers take?</AccordionTrigger>
+    <AccordionContent>
+      <p>Transfers between your own accounts arrive instantly.</p>
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+- Accordion ไม่มี `"use client"` ในตัว และไม่ต้องมีเพื่อเปิดปิด ใช้ใน Server Component ได้ ถ้าใช้ `value` คู่กับ `onValueChange` ไฟล์ต้องขึ้นต้นด้วย `"use client"`
+
+## Props และ variants
+
+Accordion **ไม่มี prop `variant` หรือ `size`** แต่ละแถวหัวข้อสูงอย่างน้อย 54px ระยะขอบ 16px ตัวอักษร 14px น้ำหนัก medium กรอบมีมุมโค้ง 18px เส้นขอบบาง และมีเส้นคั่นระหว่างรายการ
+
+### Accordion
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `multiple` | `false` | ให้หลายส่วนเปิดค้างได้ ค่าเริ่มต้นคือเปิดส่วนหนึ่งแล้วอีกส่วนจะปิด เปิดใช้เมื่อผู้ใช้อาจต้องเปรียบเทียบส่วนต่าง ๆ Nielsen Norman Group แนะนำแบบนี้ ส่วน Base UI และ Fluent ตั้งค่าเริ่มต้นให้เปิดทีละส่วน |
+| `defaultValue` | ไม่มี | ส่วนที่เปิดตั้งแต่โหลด เป็น array ของ value เช่น `["transfers"]` |
+| `value` + `onValueChange` | ไม่มี | ให้แอปควบคุมว่าส่วนไหนเปิด เช่น สำหรับปุ่ม "Show all" |
+| `disabled` | `false` | ปิดใช้งานทุกส่วน |
+| `hiddenUntilFound` | `false` | ให้การค้นหาในหน้าของเบราว์เซอร์ค้นในส่วนที่ปิดอยู่ และเปิดส่วนที่เจอ รองรับใน Chrome 102, Firefox 139 และ Safari 26.2 ขึ้นไป เปิดใช้กับหน้าคำถามที่พบบ่อยและหน้าช่วยเหลือ |
+| `keepMounted` | `false` | เก็บแผงที่ปิดไว้ในหน้าแบบซ่อน ถูกข้ามเมื่อเปิด `hiddenUntilFound` |
+| `className` | ไม่มี | ปรับ layout เฉพาะจุด |
+
+### AccordionItem
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `value` | ไม่มี | id ของรายการ ใช้กับ `defaultValue` และ `value` ต้องไม่ซ้ำกัน |
+| `disabled` | `false` | ทำให้ส่วนนี้จาง 50% เปิดไม่ได้ และ Tab ข้าม |
+| `onOpenChange` | ไม่มี | ทำงานเมื่อส่วนนี้เปิดหรือปิด |
+
+### AccordionContent
+
+`className` ใช้จัดสไตล์ด้านในของแผงที่เนื้อหาอยู่ ย่อหน้ามีระยะห่างกัน และลิงก์ขีดเส้นใต้
+
+### แสดงทั้งหมดและซ่อนทั้งหมด
+
+ยังไม่มีปุ่ม "Show all sections" ในตัว Nielsen Norman Group แนะนำให้มี และ GOV.UK วางไว้ทางซ้ายเหนือรายการ ใช้คำว่า "Show all sections" สร้างเองได้ด้วย `multiple`, `value` และ `onValueChange` ตาม story `Controlled` TODO: ตัดสินใจว่าจะทำในตัวหรือไม่ GOV.UK ยังจำส่วนที่เปิดไว้ตลอด session ซึ่งก็ยังไม่มีในตัว
+
+### พฤติกรรมในตัว
+
+- **ความหมาย:** แต่ละหัวข้อเป็นปุ่มจริงอยู่ในหัวข้อ `h3` มี `aria-expanded` บอกโปรแกรมอ่านหน้าจอว่าเปิดอยู่หรือไม่ แผงที่เปิดแต่ละอันเป็น region ที่มีชื่อตามหัวข้อ
+- **คีย์บอร์ด:** Tab ไปตามหัวข้อและเข้าไปในเนื้อหาที่เปิดอยู่ Enter หรือ Space เปิดปิด ลูกศรไม่ย้ายระหว่างหัวข้อ ตามการปรับปรุง WAI-ARIA ปี 2026
+- **สถานะเปิด:** ลูกศรชี้ลงเมื่อปิด และชี้ขึ้นเมื่อเปิด รายการที่เปิดมีพื้นเทาอ่อน สถานะจึงไม่ได้ขึ้นอยู่กับสีอย่างเดียว
+- **แอนิเมชัน:** แผงเลื่อนเปิดปิดใน 200ms ถ้าผู้ใช้ตั้งค่าลดการเคลื่อนไหว จะไม่มีอะไรเคลื่อนไหว
+
+**ปัญหาที่ทราบ: ระดับหัวข้อเป็น `h3` เสมอ** WAI-ARIA ต้องการระดับที่เข้ากับโครงสร้างหัวข้อของหน้า และ GOV.UK ใช้ `h2` เป็นค่าเริ่มต้น TODO: ให้กำหนดระดับหัวข้อได้
+
+TODO: แผงที่เปิดแต่ละอันเป็น region ที่มีชื่อ WAI-ARIA เตือนว่าถ้าเปิดพร้อมกันเกินประมาณหกอัน จะทำให้การนำทางด้วยโปรแกรมอ่านหน้าจอรก ถ้าใช้ `multiple` กับหลายส่วน อาจเกิดขึ้นได้
+
+### สถานะ
+
+| สถานะ | เกิดเมื่อ | หน้าตา |
+| ----- | --------- | ------ |
+| Hover | ชี้เมาส์บนหัวข้อ | ข้อความหัวข้อขีดเส้นใต้ |
+| Focus | โฟกัสหัวข้อด้วยคีย์บอร์ด | ขอบเทาเข้มและวงจาง 3px ภายในแถว |
+| Open | คลิก หรืออยู่ใน `value` | ลูกศรชี้ขึ้น พื้นเทาอ่อน |
+| Disabled | `disabled` | จาง 50% เปิดไม่ได้ Tab ข้าม |
+
+TODO: GOV.UK เอาสไตล์ที่ดูเหมือนลิงก์ออกจาก accordion เพราะคนคิดว่าหัวข้อเป็นลิงก์ ของเราขีดเส้นใต้หัวข้อเมื่อชี้ ตัดสินใจว่าจะเก็บไว้หรือไม่
+
+โหมดมืดทำงานอัตโนมัติเมื่อมีคลาส `.dark` บน element ที่ครอบอยู่
+
+### ความต่างของสี
+
+| อะไร | สว่าง | มืด | ต้องได้ |
+| ---- | ----- | --- | ------- |
+| ข้อความหัวข้อ รายการที่เปิด | 18.58 | 16.53 | 4.5 |
+| ลูกศร ตอนปิด | 5.27 | 8.43 | 3 |
+| ลูกศร ตอนเปิด | 5.00 | 7.37 | 3 |
+| ขอบโฟกัสเทียบกับหน้า | 5.25 | 4.60 | 3 |
+
+## Tokens ที่ใช้
+
+| Token | ใช้สำหรับ |
+| ----- | --------- |
+| `--border` | ขอบของกรอบและเส้นคั่นระหว่างรายการ |
+| `--muted` | พื้นของรายการที่เปิด ที่ 50% |
+| `--muted-foreground` | ลูกศร |
+| `--foreground` | ลิงก์ในแผงเมื่อชี้ |
+| `--ring` | ขอบโฟกัสและวงโฟกัส |
+| `--radius` | มุมของกรอบ: 1.8 × `--radius` (18px) |
+
+ข้อความหัวข้อและเนื้อหาใช้สีข้อความของหน้า
+
+## ตัวอย่าง
+
+จาก story `Playground`
+
+<Canvas of={AccordionStories.Playground} />
+
+```tsx
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "lab-package"
+
+<Accordion>
+  <AccordionItem value="transfers">
+    <AccordionTrigger>How long do transfers take?</AccordionTrigger>
+    <AccordionContent>
+      <p>
+        Transfers between your own accounts arrive instantly. Payments to other
+        banks usually arrive within one business day.
+      </p>
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="cancel">
+    <AccordionTrigger>Can I cancel a scheduled payment?</AccordionTrigger>
+    <AccordionContent>
+      <p>
+        Yes, until 5pm the day before it's due. Open the payment from Scheduled
+        and choose Cancel payment.
+      </p>
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="statements">
+    <AccordionTrigger>Where can I find my statements?</AccordionTrigger>
+    <AccordionContent>
+      <p>
+        Statements for the last 7 years are under Accounts, then Statements. You
+        can download each one as a PDF.
+      </p>
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+```

@@ -1,0 +1,68 @@
+@reference "../../styles/reference.css";
+
+/* Keep Tailwind's layer order even if this file loads before globals.css. */
+@layer theme, base, components, utilities;
+
+@layer components {
+  .root {
+    /*
+     * The border is the only thing showing an unticked checkbox is there, so it
+     * needs 3:1 (WCAG 1.4.11). shadcn's --input border is 1.23:1 on white;
+     * --muted-foreground is 5.27:1 (8.43:1 on the dark page).
+     */
+    @apply relative flex size-4 shrink-0 items-center justify-center rounded-[6px] border border-muted-foreground transition-shadow outline-none;
+    /* An invisible hit area around the box, about 40 × 32px. */
+    @apply after:absolute after:-inset-x-3 after:-inset-y-2;
+    @apply focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50;
+    @apply disabled:cursor-not-allowed disabled:opacity-50 data-disabled:cursor-not-allowed data-disabled:opacity-50;
+    @apply aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20;
+  }
+
+  :global(.dark) .root {
+    @apply bg-input/30;
+  }
+  :global(.dark) .root[aria-invalid="true"] {
+    @apply ring-destructive/40;
+  }
+
+  /*
+   * Ticked, or partly ticked: brand fill with a dark mark. On a white page the
+   * lime fill is only 1.53:1, so the box gets a dark green border (the mark's
+   * colour) to keep its outline at 3:1. shadcn used a lime border.
+   */
+  .root[data-checked],
+  .root[data-indeterminate] {
+    @apply border-primary-foreground bg-primary text-primary-foreground;
+  }
+  /* On the dark page the lime itself is 10:1, so the border matches the fill. */
+  :global(.dark) .root[data-checked],
+  :global(.dark) .root[data-indeterminate] {
+    @apply border-primary bg-primary;
+  }
+  /* A ticked box that's invalid keeps its border and fill; the red ring still shows. */
+  .root[aria-invalid="true"][data-checked] {
+    @apply border-primary-foreground;
+  }
+  :global(.dark) .root[aria-invalid="true"][data-checked] {
+    @apply border-primary;
+  }
+
+  /*
+   * Keyboard focus shows the dark ring border in every state. Without this, a
+   * ticked box keeps its lime border and the focus shows only as the faint
+   * 50% ring (about 1.5:1 on white).
+   */
+  .root[data-checked]:focus-visible,
+  .root[data-indeterminate]:focus-visible {
+    @apply border-ring;
+  }
+
+  .indicator {
+    @apply grid place-content-center text-current transition-none [&>svg]:size-3.5;
+  }
+
+  .indicator[data-indeterminate] .checkIcon,
+  .indicator:not([data-indeterminate]) .indeterminateIcon {
+    @apply hidden;
+  }
+}

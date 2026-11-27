@@ -1,0 +1,155 @@
+@reference "../../styles/reference.css";
+
+/* Keep Tailwind's layer order even if this file loads before globals.css. */
+@layer theme, base, components, utilities;
+
+@layer components {
+  /* ---- container: restyles Recharts' own (global) class names ---- */
+
+  .root {
+    @apply flex aspect-video justify-center text-xs;
+  }
+
+  /*
+   * Axis labels in the muted text colour. Recharts 3.11 names the label
+   * .recharts-cartesian-axis-tick-value (shadcn's selector only matches older
+   * versions) and sets its colour as an inline style (fill: #666), which a
+   * normal rule can't beat. Without !important, labels stay #666: 3.41:1 on the
+   * dark page, below the 4.5:1 that 12px text needs.
+   */
+  .root :global(.recharts-cartesian-axis-tick) text,
+  .root :global(.recharts-cartesian-axis-tick-value) {
+    fill: var(--muted-foreground) !important;
+  }
+
+  .root :global(.recharts-cartesian-grid) line[stroke="#ccc"],
+  .root :global(.recharts-polar-grid) [stroke="#ccc"],
+  .root :global(.recharts-reference-line) [stroke="#ccc"] {
+    @apply stroke-border;
+  }
+
+  .root :global(.recharts-cartesian-grid) line[stroke="#ccc"] {
+    @apply stroke-border/50;
+  }
+
+  .root :global(.recharts-curve.recharts-tooltip-cursor) {
+    @apply stroke-border;
+  }
+
+  .root :global(.recharts-rectangle.recharts-tooltip-cursor),
+  .root :global(.recharts-radial-bar-background-sector) {
+    @apply fill-muted;
+  }
+
+  .root :global(.recharts-dot)[stroke="#fff"],
+  .root :global(.recharts-sector)[stroke="#fff"] {
+    @apply stroke-transparent;
+  }
+
+  .root :global(.recharts-layer),
+  .root :global(.recharts-sector) {
+    @apply outline-hidden;
+  }
+
+  /*
+   * shadcn hides the outline on the chart surface too, but with Recharts'
+   * accessibility layer the surface is what takes keyboard focus. Show the
+   * shared focus ring there instead, for keyboard users only.
+   */
+  .root :global(.recharts-surface) {
+    @apply outline-hidden;
+  }
+  .root :global(.recharts-surface):focus-visible {
+    @apply rounded-md outline-2 outline-offset-2 outline-ring;
+    outline-style: solid;
+  }
+
+  /* ---- tooltip ---- */
+
+  .tooltip {
+    @apply grid min-w-32 items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs text-foreground shadow-xl;
+  }
+
+  /* An empty live region kept in place between tooltips; takes no space. */
+  .tooltipEmpty {
+    @apply sr-only;
+  }
+
+  .tooltipLabel {
+    @apply font-medium;
+  }
+
+  .tooltipItems {
+    @apply grid gap-1.5;
+  }
+
+  .tooltipItem {
+    @apply flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground;
+  }
+
+  .tooltipItem[data-indicator="dot"] {
+    @apply items-center;
+  }
+
+  .indicator {
+    @apply shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg);
+  }
+
+  .indicator[data-indicator="dot"] {
+    @apply h-2.5 w-2.5;
+  }
+
+  .indicator[data-indicator="line"] {
+    @apply w-1;
+  }
+
+  .indicator[data-indicator="dashed"] {
+    @apply w-0 border-[1.5px] border-dashed bg-transparent;
+  }
+
+  .indicator[data-indicator="dashed"][data-nested] {
+    @apply my-0.5;
+  }
+
+  .tooltipRow {
+    @apply flex flex-1 items-center justify-between leading-none;
+  }
+
+  .tooltipRow[data-nested] {
+    @apply items-end;
+  }
+
+  .tooltipNames {
+    @apply grid gap-1.5;
+  }
+
+  .tooltipName {
+    @apply text-muted-foreground;
+  }
+
+  .tooltipValue {
+    @apply font-mono font-medium text-foreground tabular-nums;
+  }
+
+  /* ---- legend ---- */
+
+  .legend {
+    @apply flex items-center justify-center gap-4;
+  }
+
+  .legend[data-align="bottom"] {
+    @apply pt-3;
+  }
+
+  .legend[data-align="top"] {
+    @apply pb-3;
+  }
+
+  .legendItem {
+    @apply flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground;
+  }
+
+  .legendSwatch {
+    @apply h-2 w-2 shrink-0 rounded-[2px];
+  }
+}

@@ -1,0 +1,218 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks"
+
+import * as AttachmentStories from "./Attachment.stories"
+
+<Meta of={AttachmentStories} name="คู่มือการใช้งาน" />
+
+# Attachment
+
+**วัตถุประสงค์:** การ์ดแสดงไฟล์แนบหนึ่งไฟล์ บอกชื่อ ประเภทและขนาด หรือสถานะการอัปโหลด พร้อมปุ่มเล็ก ๆ เช่น ลบ
+
+## ควรใช้เมื่อ
+
+- ไฟล์ที่ผู้ใช้แนบในฟอร์มหรือข้อความ ทั้งก่อนและหลังอัปโหลด เช่น ใบเสร็จ statement รูปบัตรประชาชน
+- ไฟล์ที่แนบกับรายการอยู่แล้ว ซึ่งผู้ใช้เปิด ดาวน์โหลด หรือลบได้
+
+## ไม่ควรใช้เมื่อ
+
+| แทนที่จะใช้ attachment กับ… | ให้ใช้ |
+| --------------------------- | ------ |
+| การเลือกไฟล์เพื่ออัปโหลด | ช่องเลือกไฟล์ TODO: ยังไม่มีตัวเลือกไฟล์หรือพื้นที่ลากวาง ใช้ Input กับ `type="file"` ได้ |
+| ลิงก์ไปเอกสารในเนื้อความ | ลิงก์ข้อความ |
+| ป้ายสถานะอย่างเดียว | **Badge** |
+| แกลเลอรีรูปภาพให้เลื่อนดู | TODO: ยังไม่มีแกลเลอรีหรือตารางรูปภาพ |
+
+## การเขียนเนื้อหา
+
+- **ชื่อ:** ชื่อไฟล์พร้อมนามสกุล เช่น `q3-statement.pdf`
+- **คำอธิบาย:** ประเภทและขนาดเมื่อเสร็จแล้ว เช่น "PDF · 2.4 MB" ระหว่างอัปโหลดให้บอกความคืบหน้า เช่น "Uploading · 64%" ถ้าล้มเหลวให้บอกว่าผิดอะไรและต้องทำอะไร เช่น "Upload failed. Try again." หรือ "Must be smaller than 10 MB" ถ้อยคำของ GOV.UK เป็นต้นแบบที่ดี
+- **ชื่อปุ่มต้องมีชื่อไฟล์:** "Remove q3-statement.pdf", "Retry budget-2026.xlsx", "Open q3-statement.pdf" คำว่า "Remove" อย่างเดียวไม่บอกว่าไฟล์ไหน
+- **ระหว่างอัปโหลด** ใช้ "Cancel upload of q3-statement.pdf" แทน "Remove" เพื่อให้รู้ว่าปุ่มทำอะไรในตอนนั้น
+
+## ส่วนประกอบ
+
+| ส่วน | หน้าที่ |
+| ---- | ------- |
+| **Attachment** | ตัวการ์ด เก็บสถานะ ขนาด และแนวการวาง |
+| **AttachmentMedia** | ช่องสี่เหลี่ยมจัตุรัสสำหรับไอคอนประเภทไฟล์หรือรูปตัวอย่าง |
+| **AttachmentContent** | เก็บชื่อและคำอธิบาย |
+| **AttachmentTitle** | ชื่อไฟล์ ถูกตัดด้วย … เมื่อยาวเกิน |
+| **AttachmentDescription** | ประเภทและขนาด หรือสถานะการอัปโหลด |
+| **AttachmentActions** | ปุ่มเล็กท้ายแถว หรือมุมขวาบนของ tile |
+| **AttachmentAction** | ปุ่มไอคอนเล็กหนึ่งปุ่ม เช่น ลบ หรือลองใหม่ |
+| **AttachmentTrigger** | ไม่บังคับ ลิงก์หรือปุ่มที่ขยายเต็มการ์ดเพื่อเปิดไฟล์ |
+| **AttachmentGroup** | ไม่บังคับ แถวของ attachment ที่เลื่อนในแนวนอน |
+
+## การนำเข้าและใช้งาน
+
+ติดตั้งแพ็กเกจ แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
+
+```bash
+npm install lab-package
+```
+
+```tsx
+import "lab-package/styles.css"
+```
+
+จากนั้นนำเข้า component ในไฟล์ที่ใช้
+
+```tsx
+import {
+  Attachment,
+  AttachmentAction,
+  AttachmentActions,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentGroup,
+  AttachmentMedia,
+  AttachmentTitle,
+  AttachmentTrigger,
+} from "lab-package"
+import { FileTextIcon, XIcon } from "lucide-react"
+
+<Attachment>
+  <AttachmentMedia>
+    <FileTextIcon />
+  </AttachmentMedia>
+  <AttachmentContent>
+    <AttachmentTitle>q3-statement.pdf</AttachmentTitle>
+    <AttachmentDescription>PDF · 2.4 MB</AttachmentDescription>
+  </AttachmentContent>
+  <AttachmentActions>
+    <AttachmentAction aria-label="Remove q3-statement.pdf">
+      <XIcon />
+    </AttachmentAction>
+  </AttachmentActions>
+</Attachment>
+```
+
+- นำเข้าเฉพาะส่วนที่ใช้
+- Attachment มี `"use client"` มาในตัว จึงใช้จาก Server Component ได้ ไฟล์ที่ส่งฟังก์ชัน เช่น `onClick` ให้ AttachmentAction ต้องขึ้นต้นด้วย `"use client"`
+- ไอคอนมาจาก `lucide-react` ติดตั้งในแอปก่อนใช้: `npm install lucide-react`
+
+## Props และ variants
+
+### Attachment
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `state` | `done` | `idle`: เลือกแล้วแต่ยังไม่อัปโหลด ขอบเส้นประ `uploading` และ `processing`: ชื่อมีแสงวิ่ง (shimmer) `error`: ขอบและไอคอนสีแดงอ่อน คำอธิบายสีแดง `done`: ปกติ |
+| `size` | `md` | `md`, `sm` หรือ `xs`: ระยะขอบ ขนาดตัวอักษร และขนาดช่องรูป ช่องรูปขนาด 40px, 32px หรือ 28px |
+| `orientation` | `horizontal` | `horizontal`: เป็นแถว กว้างอย่างน้อย 160px `vertical`: เป็น tile กว้าง 96px (120px เมื่อมีข้อความ) ปุ่มอยู่มุมขวาบน |
+| `className` | ไม่มี | ปรับ layout เฉพาะจุด เช่น กว้างเต็ม |
+
+การ์ดกว้างตามเนื้อหาเป็นค่าเริ่มต้น ทำให้เต็มรายการด้วย `className` ตามที่ story `Files` ทำ
+
+### AttachmentMedia
+
+| Prop | ค่าเริ่มต้น | ทำอะไร |
+| ---- | ----------- | ------ |
+| `variant` | `icon` | `icon`: ไอคอนประเภทไฟล์บนพื้นเทา `image`: รูปตัวอย่างเต็มช่อง แสดงที่ 60% จนกว่าสถานะจะเป็น `done` หรือ `idle` |
+
+ใส่ `alt=""` ให้รูปตัวอย่าง เพราะชื่อไฟล์ข้าง ๆ บอกอยู่แล้วว่าคืออะไร
+
+### AttachmentAction
+
+เป็น Button ที่ค่าเริ่มต้นคือ `variant="ghost"`, `size="xs"` และ `iconOnly` จึงขนาด 24 × 24px เท่ากับพื้นที่กดขั้นต่ำของ WCAG พอดี รับ prop ของ Button ทั้งหมด **ต้องใส่ `aria-label` ที่มีชื่อไฟล์เสมอ**
+
+### AttachmentTrigger
+
+ขยายปุ่ม หรือลิงก์ผ่าน `render` ให้เต็มการ์ด คลิกตรงไหนก็เปิดไฟล์ได้ ปุ่มต่าง ๆ ยังอยู่ด้านบนและทำงานแยกกัน
+
+- ตั้งชื่อของตัวเอง เช่น `aria-label="Open q3-statement.pdf"`
+- ถ้าเป็นลิงก์ ใช้ `render={<a href="…" />}`
+- ขณะโฟกัสด้วยคีย์บอร์ด ทั้งการ์ดจะแสดงวงโฟกัส
+- ข้อความใต้ trigger เลือก (select) ไม่ได้
+
+### AttachmentGroup
+
+แถวที่เลื่อนในแนวนอน หยุดตรงแต่ละการ์ด และขอบค่อย ๆ จาง **ควรใช้รายการธรรมดามากกว่า** สำหรับไฟล์ที่ผู้ใช้ต้องตรวจ GOV.UK, IBM Carbon และ Ministry of Justice เรียงไฟล์แนวตั้งทั้งหมด Nielsen Norman Group พบว่าคนไม่คาดว่าจะต้องเลื่อนแนวนอน ใช้ group สำหรับงานรอง เช่น รูปตัวอย่างเหนือกล่องข้อความ
+
+### AttachmentTitle และ AttachmentDescription
+
+รับ prop ของ `span` ทั้งหมด TODO: ชื่อที่ถูกตัดอ่านเต็มไม่ได้ IBM Carbon แสดงชื่อเต็มใน tooltip ส่วน GOV.UK ให้ชื่อยาวขึ้นบรรทัดใหม่แทน ระหว่างนี้ใส่ `title` เป็นชื่อเต็มได้ แต่ช่วยเฉพาะผู้ใช้เมาส์
+
+## สถานะ
+
+| สถานะ | หน้าตา | คำอธิบายที่ควรแสดง |
+| ----- | ------ | ------------------ |
+| `idle` | ขอบเส้นประ | "Ready to upload" |
+| `uploading` | ชื่อมีแสงวิ่ง รูปตัวอย่างที่ 60% | ความคืบหน้า เช่น "Uploading · 64%" |
+| `processing` | ชื่อมีแสงวิ่ง รูปตัวอย่างที่ 60% | กำลังทำอะไร เช่น "Checking the file" |
+| `error` | ขอบแดงอ่อน ไอคอนแดงบนพื้นแดงจาง คำอธิบายสีแดง | ผิดอะไรและแก้อย่างไร |
+| `done` | ปกติ | ประเภทและขนาด |
+
+สถานะแสดงเป็นคำเสมอ ไม่ได้อาศัยสีหรือการเคลื่อนไหวอย่างเดียว แสงวิ่งหยุดเมื่อผู้ใช้ตั้งค่าลดการเคลื่อนไหว
+
+- **ไม่มีแถบความคืบหน้า** TODO: Nielsen Norman Group แนะนำให้แสดงเปอร์เซ็นต์หรือแถบสำหรับงานที่นานกว่า 10 วินาที และไม่มีระบบไหนที่ตรวจสอบใช้แสงวิ่งกับการอัปโหลด ระหว่างนี้ให้ใส่เปอร์เซ็นต์ในคำอธิบาย
+- **แสงวิ่งทำงานตลอดการอัปโหลด** TODO: WCAG 2.2.2 ต้องการวิธีหยุดการเคลื่อนไหวที่นานกว่า 5 วินาทีเมื่ออยู่ข้างเนื้อหาที่ผู้ใช้กำลังใช้ ตัดสินใจว่าจะเก็บไว้สำหรับการอัปโหลดนาน ๆ หรือไม่
+
+โหมดมืดทำงานอัตโนมัติเมื่อมีคลาส `.dark` บน element ที่ครอบอยู่
+
+### การเข้าถึงที่ต้องเพิ่มเอง
+
+- **ประกาศการเปลี่ยนแปลง** โปรแกรมอ่านหน้าจอไม่ได้รับแจ้งเมื่อไฟล์อัปโหลดเสร็จหรือล้มเหลว เพิ่มข้อความสถานะแบบสุภาพ (polite) หนึ่งจุดสำหรับทั้งรายการ เช่น "q3-statement.pdf uploaded" และประกาศข้อผิดพลาดแบบ alert ประกาศความคืบหน้าประมาณทุก 10% ไม่ใช่ทุกครั้งที่เปลี่ยน WCAG 4.1.3 กำหนดไว้ TODO: ทำในตัว component
+- **ย้ายโฟกัสหลังกดลบ** ไปที่ปุ่มลบของไฟล์ถัดไป หรือไฟล์ก่อนหน้าเมื่อลบไฟล์สุดท้าย ถ้ารายการว่าง ให้ไปที่ช่องเลือกไฟล์ และพิจารณาให้ undo ได้
+- **ตั้งชื่อทุกปุ่ม** ให้มีชื่อไฟล์
+
+## ความต่างของสี
+
+| อะไร | สว่าง | มืด | ต้องได้ |
+| ---- | ----- | --- | ------- |
+| คำอธิบาย | 5.27 | 7.29 | 4.5 |
+| คำอธิบายข้อผิดพลาด | 5.44 | 5.87 | 4.5 |
+| ไอคอนข้อผิดพลาดบนพื้นจาง | 5.92 | 5.13 | 3 |
+| ขอบโฟกัสขณะ trigger ได้โฟกัส | 5.25 | 4.60 | 3 |
+| ขอบการ์ดเทียบกับหน้า | 1.23 | 1.26 | ดูด้านล่าง |
+| ขอบข้อผิดพลาดเทียบกับหน้า | 1.83 | 1.58 | ดูด้านล่าง |
+
+เส้นขอบจาง การ์ดระบุได้จากเนื้อหา และสถานะข้อผิดพลาดแสดงเป็นข้อความและไอคอนสีแดงด้วย ขอบจึงไม่ใช่สัญญาณเดียว axe (WCAG 2.2 AA) ผ่านทุก story
+
+## Tokens ที่ใช้
+
+| Token | ใช้สำหรับ |
+| ----- | --------- |
+| `--card` | พื้นหลังการ์ด |
+| `--card-foreground` | ข้อความในการ์ด |
+| `--border` | ขอบการ์ด |
+| `--muted` | พื้นช่องรูป และพื้นตอนชี้ที่ 50% เมื่อการ์ดมี trigger |
+| `--muted-foreground` | ข้อความคำอธิบาย |
+| `--foreground` | ไอคอนในช่องรูป |
+| `--destructive` | ขอบข้อผิดพลาด (30%) พื้นช่องรูป (10%) ไอคอน และคำอธิบาย |
+| `--ring` | ขอบโฟกัสและวงโฟกัสขณะ trigger ได้โฟกัส |
+| `--radius` | มุมการ์ด: 1.8 × `--radius` (18px) และ 1.4 × ที่ `xs` มุมช่องรูป: 1.4 × และ 1 × ที่ `xs` |
+
+## ตัวอย่าง
+
+จาก story `Playground` ด้วยค่าเริ่มต้น
+
+<Canvas of={AttachmentStories.Playground} />
+
+```tsx
+import {
+  Attachment,
+  AttachmentAction,
+  AttachmentActions,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentMedia,
+  AttachmentTitle,
+} from "lab-package"
+import { FileTextIcon, XIcon } from "lucide-react"
+
+<Attachment>
+  <AttachmentMedia>
+    <FileTextIcon />
+  </AttachmentMedia>
+  <AttachmentContent>
+    <AttachmentTitle>q3-statement.pdf</AttachmentTitle>
+    <AttachmentDescription>PDF · 2.4 MB</AttachmentDescription>
+  </AttachmentContent>
+  <AttachmentActions>
+    <AttachmentAction aria-label="Remove q3-statement.pdf">
+      <XIcon />
+    </AttachmentAction>
+  </AttachmentActions>
+</Attachment>
+```

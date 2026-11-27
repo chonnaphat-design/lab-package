@@ -61,6 +61,21 @@ The English `<Name>.md` is the source of truth. `<Name>.mdx` beside it is the sa
 - A change to the consumer contract (install, stylesheet, `--font-heading`, `.dark`) or to the token list also updates `Introduction.mdx`.
 - Never leave a `.md` change without its `.mdx` counterpart. If you can't translate it, stop and ask.
 
+## Adding a component
+
+Components come from shadcn's **`base-maia`** style (Base UI, `olive` base colour), the style the week-1-lab app was set up with. Get the source from `https://ui.shadcn.com/r/styles/base-maia/<name>.json`. Its `files[].content` is the TSX with Tailwind classes inline and icons as `IconPlaceholder` (use the `lucide` name).
+
+Then, in one change:
+
+1. **Convert** it to `packages/ui/src/components/<Name>/`: `<Name>.tsx` with no style classes, every class moved into `<Name>.module.css` (see [Component anatomy](#component-anatomy)), and `index.ts` exporting the parts. Keep shadcn's `data-slot` names. Add `"use client"` only if the source has it or the TSX uses hooks.
+2. **Check it against the Base UI API** (`node_modules/@base-ui/react/<name>/`) rather than trusting shadcn's classes; fix anything that doesn't work with Base UI, and say what you changed and why in a CSS comment.
+3. **Give it the shared focus ring** (`focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50`) on anything focusable, if shadcn left it out, and make sure no state rule (such as a checked fill) overrides the focus border. **A control whose border is its only outline** (checkbox, radio, switch) needs that border at 3:1: use `--muted-foreground`, not shadcn's `--input` (1.23:1), as `Checkbox.module.css` does.
+4. **Export it** from `src/index.ts` (alphabetical), and add it to `packages/ui/README.md` (component list and the `"use client"` sentence) and to the component table in `packages/ui/src/Introduction.mdx`.
+5. **Stories**: `<Name>.stories.tsx` following the Storybook rules below.
+6. **Docs**: `<Name>.md` and its Thai `<Name>.mdx`, per [Component docs](#component-docs).
+7. **If it ships `"use client"`**, add it to the list in [Checks after a change](#checks-after-a-change).
+8. **Verify** in Storybook: keyboard (Tab, Enter/Space), focus ring, states, dark mode, and axe; then run the checks. If the module `@apply`s a shadcn utility, also check `dist/styles.css` for what it needs (see the CSS Modules pitfalls).
+
 ## Component anatomy
 
 - **TSX has no style classes and no `cva`.** It sets `className={cn(styles.root, className)}` and exposes variants as `data-variant` / `data-size` / boolean `data-*` attributes. Keep shadcn's `data-slot` attributes, because other components' CSS targets them.
@@ -83,6 +98,9 @@ The English `<Name>.md` is the source of truth. `<Name>.mdx` beside it is the sa
 - **Group selectors:** use a descendant selector on the parent's class (`.root[data-disabled="true"] .addon`) instead of `group/name` + `group-*`.
 - **Utility classes in selectors:** reference them as `:global(.border-b)`.
 - **Containers:** use an unnamed `@container`. CSS custom properties are not renamed.
+- **shadcn utilities that need registered properties** (`shimmer`, `scroll-fade-*`): their `@property` rules live in `shadcn/tailwind.css`, which is only `@reference`'d, so they never reach `dist/styles.css`. Storybook hides this, because its preview loads that file in full. Copy the `@property` rules the utility reads into the component's module (see the top of `Attachment.module.css`) and confirm they are in `dist/styles.css`. Without `--shimmer-angle`, shimmering text is invisible in consumers' apps.
+- **Third-party inline styles** (Recharts sets `fill: #666` inline on axis labels) beat any module rule. Restyling them needs `!important`, which is acceptable only on those few declarations; say why in a comment, as `Chart.module.css` does. Also check that a library's class names still match its current version before trusting shadcn's selectors.
+- **Height animations (Accordion, Collapsible):** `tw-animate-css`'s `animate-accordion-*` / `animate-collapsible-*` keyframes read Radix's height variables, so with Base UI they jump instead of animating. Transition `height` from Base UI's `--accordion-panel-height` (or `--collapsible-panel-height`) and set `h-0` on `[data-starting-style]` / `[data-ending-style]`, as `Accordion.module.css` does.
 - **Restyling an embedded component** (InputGroup → Button/Input): scope under the parent (`.root .button[data-slot="button"]`) or key the state on `data-slot` in the child's own module, so the result does not depend on CSS load order.
 
 ## Storybook
@@ -98,8 +116,10 @@ The English `<Name>.md` is the source of truth. `<Name>.mdx` beside it is the sa
 `packages/ui/README.md` documents this for users. Keep the two in step.
 
 - The consumer imports `lab-package/styles.css` once.
-- The consumer provides a CSS reset (Tailwind v4 preflight), `.dark` on an ancestor for dark mode, and `--font-heading` (used by `DialogTitle` and `AlertDialogTitle`).
+- The consumer provides a CSS reset (Tailwind v4 preflight), `.dark` on an ancestor for dark mode, and `--font-heading` (used by `DialogTitle`, `AlertDialogTitle` and `CardTitle`).
 - `react` / `react-dom` 19 are `peerDependencies`. Next.js is never a dependency.
+- `recharts` 3 is a `peerDependency` (and a `devDependency` for the build and Storybook). Consumers build charts from Recharts' own parts inside `ChartContainer`, and Recharts 3 shares chart state through React context, so a second copy bundled as our `dependency` would break charts. **Any library that consumers also import directly goes in `peerDependencies`, never `dependencies`.**
+- A library used only in a story to show a pattern (`@tanstack/react-table` in the Table `DataTable` recipe) goes in `devDependencies` only. The component's `.md` tells consumers to install it themselves.
 - Renaming or removing an export, prop, variant, `data-slot` or token is a breaking change. Call it out in your summary.
 
 ## Checks after a change
@@ -110,7 +130,7 @@ Run the library's `typecheck`, `build` and `pack:check`, plus `build-storybook` 
 
 And against `packages/ui/dist/`:
 
-- Each component whose source starts with `"use client"` (currently AlertDialog, Dialog, InputGroup, InputOTP) still starts with it in `dist/components/<Name>/<Name>.js`.
+- Each component whose source starts with `"use client"` (currently AlertDialog, Attachment, Avatar, Chart, Checkbox, Dialog, InputGroup, InputOTP, Table) still starts with it in `dist/components/<Name>/<Name>.js`.
 - `grep -r "@/" dist` returns nothing, and no `*.stories.*` file is in `dist/`.
 - The pack file list contains only `dist/**`, `README.md` and `package.json`.
 

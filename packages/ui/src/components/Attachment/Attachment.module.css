@@ -1,0 +1,183 @@
+@reference "../../styles/reference.css";
+
+/* Keep Tailwind's layer order even if this file loads before globals.css. */
+@layer theme, base, components, utilities;
+
+/*
+ * shadcn's `shimmer` and `scroll-fade-x` utilities read these registered
+ * properties. They live in shadcn/tailwind.css, which is only @reference'd and
+ * never shipped, so register them here or they are missing in consumers' apps.
+ * Without --shimmer-angle the shimmer gradient is invalid and the file name
+ * turns invisible (its text fill is transparent).
+ */
+@property --shimmer-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 20deg;
+}
+@property --shimmer-image {
+  syntax: "*";
+  inherits: false;
+}
+@property --shimmer-text-fill {
+  syntax: "*";
+  inherits: false;
+}
+@property --scroll-fade-s {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-e {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-mask {
+  syntax: "*";
+  inherits: false;
+}
+
+@layer components {
+  /* ---- card ---- */
+
+  .root {
+    @apply relative flex w-fit max-w-full min-w-0 shrink-0 flex-wrap rounded-2xl border bg-card text-card-foreground transition-colors;
+    /* A card with a trigger (a direct link or button child) is clickable, so it reacts to hover. */
+    @apply has-[>a,>button]:hover:bg-muted/50;
+    /*
+     * The trigger has no outline of its own, so the card shows the shared focus
+     * ring while the trigger has keyboard focus. (shadcn used a 1px ring at 50%
+     * on any focus inside the card, which was too faint.)
+     */
+    @apply has-[>[data-slot=attachment-trigger]:focus-visible]:border-ring has-[>[data-slot=attachment-trigger]:focus-visible]:ring-[3px] has-[>[data-slot=attachment-trigger]:focus-visible]:ring-ring/50;
+  }
+
+  .root[data-state="idle"] {
+    @apply border-dashed;
+  }
+
+  .root[data-state="error"] {
+    @apply border-destructive/30;
+  }
+
+  /* ---- size ---- */
+
+  .root[data-size="md"] {
+    @apply gap-2 text-sm has-data-[slot=attachment-content]:px-2.5 has-data-[slot=attachment-content]:py-2 has-data-[slot=attachment-media]:p-2;
+  }
+
+  .root[data-size="sm"] {
+    @apply gap-2.5 text-xs has-data-[slot=attachment-content]:px-2 has-data-[slot=attachment-content]:py-1.5 has-data-[slot=attachment-media]:p-1.5;
+  }
+
+  .root[data-size="xs"] {
+    @apply gap-1.5 rounded-xl text-xs has-data-[slot=attachment-content]:px-1.5 has-data-[slot=attachment-content]:py-1 has-data-[slot=attachment-media]:p-1;
+  }
+
+  /* ---- orientation ---- */
+
+  .root[data-orientation="horizontal"] {
+    @apply min-w-40 items-center;
+  }
+
+  .root[data-orientation="vertical"] {
+    @apply w-24 flex-col has-data-[slot=attachment-content]:w-30;
+  }
+
+  /* ---- media ---- */
+
+  .media {
+    @apply relative flex aspect-square w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted text-foreground;
+    @apply [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4;
+  }
+
+  /* Size rules come before orientation, so a vertical tile's media fills its width at every size. */
+  .root[data-size="sm"] .media {
+    @apply w-8;
+  }
+
+  .root[data-size="xs"] .media {
+    @apply w-7 rounded-lg [&_svg:not([class*='size-'])]:size-3.5;
+  }
+
+  .root[data-orientation="vertical"] .media {
+    @apply w-full [&_svg:not([class*='size-'])]:size-6;
+  }
+
+  .root[data-state="error"] .media {
+    @apply bg-destructive/10 text-destructive;
+  }
+
+  .media[data-variant="image"] {
+    @apply opacity-60 *:[img]:aspect-square *:[img]:w-full *:[img]:object-cover;
+  }
+
+  .root[data-state="done"] .media[data-variant="image"],
+  .root[data-state="idle"] .media[data-variant="image"] {
+    @apply opacity-100;
+  }
+
+  /* ---- text ---- */
+
+  .content {
+    @apply max-w-full min-w-0 flex-1 leading-tight;
+  }
+
+  .root[data-orientation="vertical"] .content {
+    @apply px-1;
+  }
+
+  .title {
+    @apply block max-w-full min-w-0 truncate font-medium;
+  }
+
+  /* Shimmering name while the file is on its way. Stops under reduced motion. */
+  .root[data-state="uploading"] .title,
+  .root[data-state="processing"] .title {
+    @apply shimmer;
+  }
+
+  /*
+   * shimmer's own dark highlight uses the `dark` variant, which can't see the
+   * renamed .dark in a CSS Module. Restate it.
+   */
+  :global(.dark) .root[data-state="uploading"] .title,
+  :global(.dark) .root[data-state="processing"] .title {
+    --shimmer-color: oklch(from currentColor max(0.8, calc(l + 0.4)) c h / calc(alpha + 0.4));
+  }
+
+  .description {
+    @apply mt-0.5 block max-w-full min-w-0 truncate text-xs text-muted-foreground;
+  }
+
+  .root[data-state="error"] .description {
+    @apply text-destructive/80;
+  }
+  /* shadcn's 80% red is 4.23:1 on the dark card; full strength passes 4.5:1. */
+  :global(.dark) .root[data-state="error"] .description {
+    @apply text-destructive;
+  }
+
+  /* ---- actions ---- */
+
+  .actions {
+    @apply relative z-20 flex shrink-0 items-center;
+  }
+
+  .root[data-orientation="vertical"] .actions {
+    @apply absolute top-3 right-3 gap-1;
+  }
+
+  /* Stretched over the card, under the actions, so the actions stay clickable. */
+  .trigger {
+    @apply absolute inset-0 z-10 rounded-[inherit] outline-none;
+  }
+
+  /* ---- group ---- */
+
+  .group {
+    @apply flex min-w-0 snap-x snap-mandatory scroll-px-1 gap-3 overflow-x-auto overscroll-x-contain py-1 scroll-fade-x no-scrollbar;
+    @apply *:data-[slot=attachment]:flex-none *:data-[slot=attachment]:snap-start;
+  }
+}

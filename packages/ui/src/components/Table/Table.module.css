@@ -1,0 +1,47 @@
+@reference "../../styles/reference.css";
+
+/* Keep Tailwind's layer order even if this file loads before globals.css. */
+@layer theme, base, components, utilities;
+
+@layer components {
+  /* Focusable only while it scrolls (set in Table.tsx), so keyboard users can scroll it.
+     An outline, not a ring: the container has no border, and --ring reaches 3:1 on its own. */
+  .container {
+    @apply relative w-full overflow-x-auto rounded-md outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ring;
+  }
+
+  .root {
+    @apply w-full caption-top text-sm;
+  }
+
+  .header {
+    @apply [&_tr]:border-b;
+  }
+
+  .body {
+    @apply [&_tr:last-child]:border-0;
+  }
+
+  .footer {
+    @apply border-t bg-muted/50 font-medium [&>tr]:last:border-b-0;
+  }
+
+  .row {
+    @apply border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted;
+  }
+
+  /* A row with a checkbox in its first cell needs less padding next to it. */
+  .head {
+    @apply h-12 px-3 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0;
+  }
+
+  .cell {
+    @apply p-3 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0;
+  }
+
+  /* Above the table, left-aligned, as in GOV.UK, Carbon and Primer: it names the table like a
+     heading, and screen readers read it first. shadcn puts it below. */
+  .caption {
+    @apply mb-3 text-left text-sm text-muted-foreground;
+  }
+}

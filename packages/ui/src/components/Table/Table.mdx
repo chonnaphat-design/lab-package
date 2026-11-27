@@ -1,0 +1,216 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks"
+
+import * as TableStories from "./Table.stories"
+
+<Meta of={TableStories} name="คู่มือการใช้งาน" />
+
+# Table
+
+**วัตถุประสงค์:** แถวและคอลัมน์ของข้อมูลที่ผู้ใช้เปรียบเทียบกัน เช่น รายการชำระเงินที่มีวันที่ สถานะ และจำนวนเงิน
+
+## ควรใช้เมื่อ
+
+- **ข้อมูลที่ทุกรายการมีช่องเหมือนกัน** ผู้ใช้ไล่ดูลงตามคอลัมน์ หรือเทียบข้ามแถว
+- **ตัวเลขที่ต้องเปรียบเทียบ** เช่น จำนวนเงิน พร้อมยอดรวมในแถวท้าย
+- **ตารางข้อมูล** ที่ผู้ใช้เรียงลำดับ กรอง เลือกแถว และเปลี่ยนหน้าได้ สร้างจาก Table นี้กับ TanStack Table ในแอปของคุณ ดู[สูตรตารางข้อมูล](#สูตรตารางข้อมูล)
+
+## ไม่ควรใช้เมื่อ
+
+| แทนที่จะใช้ตารางกับ… | ให้ใช้ |
+| -------------------- | ------ |
+| จัดหน้าหรือฟอร์มเป็นคอลัมน์ | CSS grid หรือ flex ตารางใช้กับข้อมูลเท่านั้น |
+| รายการไม่กี่ชิ้นที่มีช่องต่างกัน หรือรายละเอียดของรายการเดียว | Card หรือรายการคู่ชื่อกับค่า |
+| สเปรดชีตที่ผู้ใช้แก้ทีละช่องด้วยปุ่มลูกศร | grid widget TODO: แพ็กเกจยังไม่มี |
+| รายการที่แต่ละรายการเป็นลิงก์เดียว | รายการ (`ul`) ของลิงก์ หรือ Card |
+| แนวโน้มตามเวลา | Chart โดยมีตารางเป็นมุมมองทางเลือกถ้าจำเป็น |
+
+## การเขียนตาราง
+
+- **ใส่ caption** ที่บอกว่าตารางมีอะไร เช่น "Payments in June 2026" เป็นชื่อของตารางสำหรับโปรแกรมอ่านหน้าจอ และแสดงอยู่เหนือตารางชิดซ้าย เหมือนหัวข้อ
+- **หัวคอลัมน์ทุกช่องเป็น `TableHead` ที่มี `scope="col"`** ชื่อของแถวในช่องแรก หรือ "Total" ในแถวท้าย เป็น `TableHead` ที่มี `scope="row"`
+- **ตัวเลขและหัวคอลัมน์ของมันชิดขวา** และใช้ `tabular-nums` ให้หลักตัวเลขตรงกัน
+- **ช่องว่างให้ปล่อยว่าง** อย่าใส่ "-" หรือ "x" เพราะโปรแกรมอ่านหน้าจอจะอ่านออกมา
+- **ให้เป็นตารางธรรมดา** อย่าเพิ่ม `role="grid"` checkbox ปุ่ม และลิงก์ในช่องใช้ได้ตามปกติ
+- **อย่าทำให้ทั้งแถวคลิกได้** ใส่ลิงก์หรือปุ่มจริงในช่องเดียว เช่น ช่องแรก ที่บอกชื่อรายการ
+
+## การนำเข้าและใช้งาน
+
+ติดตั้งแพ็กเกจ แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`:
+
+```bash
+npm install lab-package
+```
+
+```tsx
+import "lab-package/styles.css"
+```
+
+จากนั้นนำเข้าส่วนที่ใช้:
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "lab-package"
+
+<Table>
+  <TableCaption>Payments in June 2026</TableCaption>
+  <TableHeader>
+    <TableRow>
+      <TableHead scope="col">Description</TableHead>
+      <TableHead scope="col" className="text-right">Amount</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell>Rent</TableCell>
+      <TableCell className="text-right tabular-nums">-$1,450.00</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+```
+
+- Table มาพร้อม `"use client"` จึง render จาก Server Component และส่งข้อมูลให้ได้ ตารางข้อมูลที่เรียงลำดับหรือเลือกแถวได้ต้องเก็บ state ไฟล์นั้นจึงต้องมี `"use client"`
+
+## Props และ variants
+
+Table **ไม่มี prop `variant` หรือ `size`** ช่องหัวตารางสูง 48px ช่องข้อมูลมี padding 12px และตัวอักษร 14px
+
+| ส่วน | คืออะไร |
+| ---- | ------- |
+| `Table` | ตาราง อยู่ในกล่องที่เลื่อนด้านข้างได้เมื่อตารางกว้างเกิน รับ prop ของ `table` ทุกตัว เช่น `aria-label` |
+| `TableCaption` | ชื่อของตาราง แสดงเหนือตาราง วางเป็นลำดับแรกใน `Table` |
+| `TableHeader` | แถวหัวตาราง (`thead`) |
+| `TableBody` | แถวข้อมูล (`tbody`) |
+| `TableFooter` | แถวสรุป เช่น ยอดรวม (`tfoot`) บนพื้นเทาอ่อน |
+| `TableRow` | แถว ไฮไลต์เมื่อชี้เมาส์ แถวที่เลือกให้ใส่ `data-state="selected"` |
+| `TableHead` | ช่องหัว (`th`) ใส่ `scope="col"` หรือ `scope="row"` |
+| `TableCell` | ช่องข้อมูล (`td`) ใช้ `colSpan` เพื่อคร่อมหลายคอลัมน์ |
+
+ทุกส่วนรับ `className` สำหรับปรับเฉพาะจุด
+
+### ตารางกว้าง
+
+เมื่อตารางกว้างกว่ากล่องที่ครอบ จะเลื่อนด้านข้างได้ ระหว่างนั้นกล่องจะรับโฟกัสด้วย Tab ได้ ผู้ใช้คีย์บอร์ดจึงเลื่อนด้วยปุ่มลูกศรได้ มีเส้นขอบเข้มเมื่อโฟกัส และโปรแกรมอ่านหน้าจออ่านเป็น region ที่ชื่อตาม caption หรือตาม `aria-label` ของตารางถ้าไม่มี caption ดู story `Scrolling`
+
+ข้อความในช่องไม่ขึ้นบรรทัดใหม่ ข้อความยาวจึงทำให้คอลัมน์กว้างขึ้น คอลัมน์ที่มีข้อความยาวให้ใส่ `className="whitespace-normal"` ที่ช่องของมัน
+
+TODO: ยังไม่มีหัวตารางหรือคอลัมน์แรกแบบติดอยู่กับที่
+
+### แถวที่เลือก
+
+`data-state="selected"` ทำให้แถวมีพื้นเทา สีอย่างเดียวไม่ได้บอกทุกคน จึงต้องแสดงการเลือกด้วย Checkbox ที่ติ๊กในแถวนั้นด้วย โดยมีชื่อตามแถว เช่น "Select Rent" ดู story `SelectedRow`
+
+### สถานะ
+
+| สถานะ | ตั้งอย่างไร | หน้าตา |
+| ----- | ---------- | ------ |
+| ปกติ | ค่าเริ่มต้น | เส้นบางคั่นระหว่างแถว |
+| Hover | ชี้เมาส์บนแถว | พื้นเทาอ่อน |
+| เลือกแล้ว | `data-state="selected"` | พื้นเทา |
+| โฟกัสกล่องเลื่อน | Tab ขณะที่เลื่อนได้ | เส้นขอบเข้มรอบตาราง |
+
+โหมดมืดทำงานอัตโนมัติเมื่อมี class `.dark` บน element แม่
+
+## สูตรตารางข้อมูล
+
+story `DataTable` สร้างตารางข้อมูลจาก Table นี้กับ [TanStack Table](https://tanstack.com/table) ร่วมกับ Checkbox, Input, Button และ Badge ของเรา คัดลอกโค้ดได้จาก Storybook TanStack Table ไม่ได้เป็นส่วนของแพ็กเกจนี้ ให้ติดตั้งในแอปของคุณ:
+
+```bash
+npm install @tanstack/react-table
+```
+
+สูตรนี้ทำอะไร และสิ่งที่ต้องคงไว้ถ้าแก้:
+
+- **เรียงลำดับ** หัวคอลัมน์ที่เรียงได้มี `Button` แบบ ghost พร้อมชื่อคอลัมน์และไอคอนลูกศร ไอคอนซ่อนจากโปรแกรมอ่านหน้าจอ `TableHead` ของคอลัมน์ที่เรียงอยู่มี `aria-sort="ascending"` หรือ `"descending"` หัวอื่นไม่มี
+- **กรอง** `Input` แบบค้นหาที่มี label มองเห็นได้ "Filter payments" เมื่อไม่มีผลลัพธ์ จะมีแถวเดียวคร่อมทุกคอลัมน์บอกไว้ เช่น "No payments match "zzz"."
+- **เลือกแถว** แต่ละแถวมี Checkbox ที่มีชื่อตามแถว เช่น "Select Rent" และแถวที่เลือกมี `data-state="selected"` Checkbox ที่หัวตาราง "Select all on this page" แสดงเป็นติ๊กบางส่วนเมื่อเลือกไว้แค่บางแถว
+- **แบ่งหน้า** ปุ่ม "Previous page" และ "Next page" ใน `nav` ชื่อ "Pagination" หน้าละ 5 แถว แต่ละปุ่มปิดใช้งานเมื่อถึงหน้าสุดทางของมัน
+- **บรรทัดสถานะ** บรรทัดเดียวที่มี `role="status"` เช่น "2 of 12 selected · Showing 1–5 of 12 · Sorted by amount, ascending" โปรแกรมอ่านหน้าจอจะอ่านเมื่อตัวกรอง หน้า การเลือก หรือการเรียงเปลี่ยน
+
+TODO: ยังไม่มีเมนูเลือกคอลัมน์ที่แสดง เมนูการกระทำของแถว หรือสถานะกำลังโหลด
+
+<Canvas of={TableStories.DataTable} />
+
+## ความต่างของสี
+
+| อะไร | สว่าง | มืด | ต้องการ |
+| ---- | ----- | --- | ------- |
+| ข้อความในช่องและหัวตาราง | 19.59 | 18.90 | 4.5 |
+| ข้อความในแถวที่เลือก | 17.76 | 13.78 | 4.5 |
+| Caption | 5.27 | 8.43 | 4.5 |
+| เส้นโฟกัสกล่องเลื่อนเทียบกับพื้นหน้า | 5.25 | 4.60 | 3 |
+
+axe (WCAG 2.2 AA) ผ่านทุก story
+
+## Tokens ที่ใช้
+
+| Token | ใช้กับ |
+| ----- | ------ |
+| `--foreground` | ข้อความหัวตารางและในช่อง |
+| `--muted-foreground` | Caption |
+| `--muted` | พื้นของแถวที่ชี้เมาส์และแถวที่เลือก และแถวท้ายที่ 50% |
+| `--border` | เส้นคั่นระหว่างแถวและเหนือแถวท้าย |
+| `--ring` | เส้นโฟกัสกล่องเลื่อน |
+
+## ตัวอย่าง
+
+story `Playground`:
+
+<Canvas of={TableStories.Playground} />
+
+```tsx
+import {
+  Badge,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "lab-package"
+
+<Table>
+  <TableCaption>Payments in June 2026</TableCaption>
+  <TableHeader>
+    <TableRow>
+      <TableHead scope="col">Date</TableHead>
+      <TableHead scope="col">Description</TableHead>
+      <TableHead scope="col">Status</TableHead>
+      <TableHead scope="col" className="text-right">Amount</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell>2026-06-03</TableCell>
+      <TableCell>Salary</TableCell>
+      <TableCell>
+        <Badge variant="secondary">Paid</Badge>
+      </TableCell>
+      <TableCell className="text-right tabular-nums">$3,200.00</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>2026-06-05</TableCell>
+      <TableCell>Electricity bill</TableCell>
+      <TableCell>
+        <Badge variant="outline">Pending</Badge>
+      </TableCell>
+      <TableCell className="text-right tabular-nums">-$182.40</TableCell>
+    </TableRow>
+  </TableBody>
+  <TableFooter>
+    <TableRow>
+      <TableHead scope="row" colSpan={3}>Total</TableHead>
+      <TableCell className="text-right tabular-nums">$3,017.60</TableCell>
+    </TableRow>
+  </TableFooter>
+</Table>
+```
