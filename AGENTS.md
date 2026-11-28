@@ -8,7 +8,7 @@ The components were built and reviewed in the week-1-lab app and copied here. Th
 
 An npm workspace. Run every command from the repo root.
 
-- `packages/ui/`: the published library, npm name `lab-package`. Its `package.json`, `vite.config.ts` and `README.md` (the npm page) live here.
+- `packages/ui/`: the published library, npm name `@chonny_iamsrithong/lab-package`. Its `package.json`, `vite.config.ts` and `README.md` (the npm page) live here.
 - `apps/storybook/`: private Storybook 10 workspace (`@lab-package/storybook`) for checking props and states. It holds config only. Stories live beside the components.
 - Root `package.json`: private (`lab-package-workspace`). It holds the `workspaces` list and the `build` / `storybook` / `build-storybook` scripts.
 
@@ -18,15 +18,15 @@ An npm workspace. Run every command from the repo root.
 
 ```bash
 npm install                            # all workspaces
-npm run build                          # same as: npm run build -w lab-package (vite build → packages/ui/dist/)
-npm run typecheck -w lab-package       # tsc --noEmit (components and stories)
-npm run pack:check -w lab-package      # npm pack --dry-run: the exact publish file list
+npm run build                          # same as: npm run build -w @chonny_iamsrithong/lab-package (vite build → packages/ui/dist/)
+npm run typecheck -w @chonny_iamsrithong/lab-package       # tsc --noEmit (components and stories)
+npm run pack:check -w @chonny_iamsrithong/lab-package      # npm pack --dry-run: the exact publish file list
 npm run storybook                      # dev server, http://localhost:6006
 npm run build-storybook                # static build → apps/storybook/storybook-static
 npm run typecheck -w @lab-package/storybook   # .storybook/main.ts + preview.ts
 ```
 
-To try the package in a real app, run `npm pack -w lab-package` and install the `.tgz` there. Avoid `npm link`: it resolves a second copy of React and breaks hooks with "Invalid hook call".
+To try the package in a real app, run `npm pack -w @chonny_iamsrithong/lab-package` and install the `.tgz` there. Avoid `npm link`: it resolves a second copy of React and breaks hooks with "Invalid hook call".
 
 ## How the build works
 
@@ -34,7 +34,8 @@ Paths below are relative to `packages/ui/`.
 
 - **Vite 8 library mode** (Rolldown) with `vite-plugin-dts` produces ESM only, `.d.ts` files and source maps. Vite was chosen over tsup because it compiles CSS Modules and Tailwind `@apply` in one pass. The dts step excludes `*.stories.tsx`.
 - **`preserveModules`** emits one file per source module, so each component keeps its own `"use client"`. Rolldown prints `MODULE_LEVEL_DIRECTIVE` warnings for these, which is expected.
-- **All CSS goes into one `dist/styles.css`** (`cssCodeSplit: false`), exported as `lab-package/styles.css`. The import of `tokens.css` in `src/index.ts` is what puts the tokens in that file. The JS output carries no CSS import, so consumers import the stylesheet themselves.
+- **All CSS goes into one `dist/styles.css`** (`cssCodeSplit: false`), exported as `@chonny_iamsrithong/lab-package/styles.css`. The import of `tokens.css` in `src/index.ts` is what puts the tokens in that file. The JS output carries no CSS import, so consumers import the stylesheet themselves.
+- **Usage docs ship in `dist/docs/`.** A small plugin in `vite.config.ts` copies the English `<Name>.md` of every component exported from `src/index.ts` to `dist/docs/<Name>.md`, rewriting `../Button/Button.md` links to `./Button.md`. The build fails if an exported component has no `.md`. Thai `.mdx` pages and `Button/README.md` are not shipped.
 - **Externals** come from `dependencies` + `peerDependencies` in `package.json`. A new runtime dependency is externalised automatically once it is listed there.
 - Tailwind runs **only at build time**, through `postcss.config.mjs`. Utilities used via `@apply` compile with fallbacks (`var(--spacing,.25rem)`), so consumers need no Tailwind `@source` pointing at this package.
 
@@ -50,7 +51,7 @@ Paths below are relative to `packages/ui/`.
 
 Before building or reviewing UI, read the `<Name>.md` doc beside each component you use, in `packages/ui/src/components/<Name>/`. For example, any UI with a button means reading `packages/ui/src/components/Button/Button.md` first. Use only the props, variants and tokens listed there. If something you need is not documented, stop and ask.
 
-When you add or change a component, write or update its `<Name>.md` in the same change, matching `Dialog.md`: Purpose (one line), When to use, When not to use, Import and use, Props and variants, Tokens used, and one example taken from the stories. Write it for designers and agents building UI, so leave out data attributes and CSS utilities. **Import and use** shows the package install, the one-time `lab-package/styles.css` import, the import line with every public part of the component, a minimal snippet, and whether the file needs `"use client"` in Next.js. Mark anything unsure as TODO.
+When you add or change a component, write or update its `<Name>.md` in the same change, matching `Dialog.md`: Purpose (one line), When to use, When not to use, Import and use, Props and variants, Tokens used, and one example taken from the stories. Write it for designers and agents building UI, so leave out data attributes and CSS utilities. **Import and use** shows the package install, the one-time `@chonny_iamsrithong/lab-package/styles.css` import, the import line with every public part of the component, a minimal snippet, and whether the file needs `"use client"` in Next.js. Mark anything unsure as TODO.
 
 ### Keep the Storybook page in step
 
@@ -115,7 +116,7 @@ Then, in one change:
 
 `packages/ui/README.md` documents this for users. Keep the two in step.
 
-- The consumer imports `lab-package/styles.css` once.
+- The consumer imports `@chonny_iamsrithong/lab-package/styles.css` once.
 - The consumer provides a CSS reset (Tailwind v4 preflight), `.dark` on an ancestor for dark mode, and `--font-heading` (used by `DialogTitle`, `AlertDialogTitle` and `CardTitle`).
 - `react` / `react-dom` 19 are `peerDependencies`. Next.js is never a dependency.
 - `recharts` 3 is a `peerDependency` (and a `devDependency` for the build and Storybook). Consumers build charts from Recharts' own parts inside `ChartContainer`, and Recharts 3 shares chart state through React context, so a second copy bundled as our `dependency` would break charts. **Any library that consumers also import directly goes in `peerDependencies`, never `dependencies`.**
@@ -124,7 +125,7 @@ Then, in one change:
 
 ## Checks after a change
 
-Run the library's `typecheck`, `build` and `pack:check`, plus `build-storybook` when a component, its stories, or a `.md` / `.mdx` doc changed. Then confirm:
+Run the library's `typecheck`, `build` and `pack:check`, plus `build-storybook` when a component, its stories, or a `.md` / `.mdx` doc changed. Then confirm the list below; `node .github/scripts/verify.mjs --base origin/main` checks all of it. CI (`.github/workflows/ci.yml`) runs every step on each pull request into `main` or `develop` and on pushes to them:
 
 - Every `<Name>.md` in `git status` has its `<Name>.mdx` changed too, and the Storybook build lists each component's **คู่มือการใช้งาน** page.
 
@@ -136,4 +137,4 @@ And against `packages/ui/dist/`:
 
 ## Publishing
 
-Publishing is the maintainer's call (planned for Week 4). Agents get the release ready and stop at `npm run pack:check -w lab-package`.
+Publishing is the maintainer's call (planned for Week 4). Agents get the release ready and stop at `npm run pack:check -w @chonny_iamsrithong/lab-package`.

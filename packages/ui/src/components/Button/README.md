@@ -3,7 +3,7 @@
 Triggers an action. Built on [Base UI `Button`](https://base-ui.com/react/components/button), styled entirely from design tokens through a CSS Module.
 
 ```tsx
-import { Button } from "lab-package"
+import { Button } from "@chonny_iamsrithong/lab-package"
 
 <Button>Save</Button>
 <Button variant="outline" size="sm">Cancel</Button>

@@ -39,11 +39,11 @@
 Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 Then import the component where you use it:
@@ -56,7 +56,7 @@ import {
   AvatarGroup,
   AvatarGroupCount,
   AvatarImage,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 <Avatar role="img" aria-label="Ana Lima">
   <AvatarImage src="/people/ana.jpg" alt="" />
@@ -154,7 +154,7 @@ import {
   AvatarGroup,
   AvatarGroupCount,
   AvatarImage,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 <AvatarGroup role="group" aria-label="People on this account">
   <Avatar role="img" aria-label="Ana Lima">

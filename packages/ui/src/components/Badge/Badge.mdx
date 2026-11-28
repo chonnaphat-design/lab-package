@@ -41,17 +41,17 @@ import * as BadgeStories from "./Badge.stories"
 ติดตั้งแพ็กเกจ แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 จากนั้นนำเข้า component ในไฟล์ที่ใช้
 
 ```tsx
-import { Badge } from "lab-package"
+import { Badge } from "@chonny_iamsrithong/lab-package"
 
 <Badge variant="secondary">Pending</Badge>
 ```
@@ -151,7 +151,7 @@ badge ที่ไม่ใช่ลิงก์จะไม่เปลี่�
 <Canvas of={BadgeStories.Statuses} />
 
 ```tsx
-import { Badge } from "lab-package"
+import { Badge } from "@chonny_iamsrithong/lab-package"
 
 <Badge>Paid</Badge>
 <Badge variant="secondary">Pending</Badge>

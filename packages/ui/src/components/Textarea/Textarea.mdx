@@ -45,17 +45,17 @@ TODO: ยังไม่มี component ตัวนับตัวอักษ
 ติดตั้งแพ็กเกจ แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 จากนั้นนำเข้า component ในไฟล์ที่ใช้
 
 ```tsx
-import { Textarea } from "lab-package"
+import { Textarea } from "@chonny_iamsrithong/lab-package"
 
 <label htmlFor="note">Note to recipient</label>
 <Textarea id="note" rows={5} />
@@ -132,7 +132,7 @@ attribute ปกติอื่น ๆ เช่น `name`, `required` และ
 <Canvas of={TextareaStories.WithLabel} />
 
 ```tsx
-import { Textarea } from "lab-package"
+import { Textarea } from "@chonny_iamsrithong/lab-package"
 
 <div className="grid gap-2">
   <label htmlFor="textarea-note" className="text-sm font-medium">

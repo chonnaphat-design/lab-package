@@ -42,17 +42,17 @@ Input เป็นแค่ช่องกรอก ไม่มี label คำ
 ติดตั้งแพ็กเกจ แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 จากนั้นนำเข้า component ในไฟล์ที่ใช้
 
 ```tsx
-import { Input } from "lab-package"
+import { Input } from "@chonny_iamsrithong/lab-package"
 
 <label htmlFor="email">Work email</label>
 <Input id="email" type="email" autoComplete="email" spellCheck={false} />
@@ -139,7 +139,7 @@ attribute ปกติอื่น ๆ เช่น `name`, `required`, `spellCh
 <Canvas of={InputStories.WithLabel} />
 
 ```tsx
-import { Input } from "lab-package"
+import { Input } from "@chonny_iamsrithong/lab-package"
 
 <div className="grid gap-2">
   <label htmlFor="input-email" className="text-sm font-medium">

@@ -49,11 +49,11 @@ import * as ChartStories from "./Chart.stories"
 ติดตั้งแพ็กเกจ **และ Recharts** แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
 
 ```bash
-npm install lab-package recharts
+npm install @chonny_iamsrithong/lab-package recharts
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 จากนั้นนำเข้าส่วนของกราฟจาก `lab-package` และตัวกราฟจาก `recharts`
@@ -69,7 +69,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 const config = {
   income: { label: "Income", color: "var(--chart-2)" },
@@ -203,7 +203,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 const config = {
   income: { label: "Income", color: "var(--chart-2)" },

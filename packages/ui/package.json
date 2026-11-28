@@ -1,6 +1,6 @@
 {
-  "name": "lab-package",
-  "version": "0.0.1",
+  "name": "@chonny_iamsrithong/lab-package",
+  "version": "1.0.0",
   "description": "React design system built from shadcn/ui on Base UI, styled with CSS Modules over OKLCH tokens.",
   "type": "module",
   "sideEffects": [
@@ -17,6 +17,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "vite build",
     "typecheck": "tsc --noEmit",

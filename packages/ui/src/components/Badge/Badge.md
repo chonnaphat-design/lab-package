@@ -35,17 +35,17 @@ Use badges sparingly. A page full of them stops drawing the eye, and each produc
 Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 Then import the component where you use it:
 
 ```tsx
-import { Badge } from "lab-package"
+import { Badge } from "@chonny_iamsrithong/lab-package"
 
 <Badge variant="secondary">Pending</Badge>
 ```
@@ -143,7 +143,7 @@ Dark `primary` passes with no margin. Any change to the dark `--primary` or `--p
 The `Statuses` story:
 
 ```tsx
-import { Badge } from "lab-package"
+import { Badge } from "@chonny_iamsrithong/lab-package"
 
 <Badge>Paid</Badge>
 <Badge variant="secondary">Pending</Badge>

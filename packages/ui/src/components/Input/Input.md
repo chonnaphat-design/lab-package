@@ -36,17 +36,17 @@ Input is the field only. It has no built-in label, hint or error message, so you
 Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 Then import the component where you use it:
 
 ```tsx
-import { Input } from "lab-package"
+import { Input } from "@chonny_iamsrithong/lab-package"
 
 <label htmlFor="email">Work email</label>
 <Input id="email" type="email" autoComplete="email" spellCheck={false} />
@@ -131,7 +131,7 @@ Typed text takes the page's text colour.
 The `WithLabel` story, written out with its default controls:
 
 ```tsx
-import { Input } from "lab-package"
+import { Input } from "@chonny_iamsrithong/lab-package"
 
 <div className="grid gap-2">
   <label htmlFor="input-email" className="text-sm font-medium">

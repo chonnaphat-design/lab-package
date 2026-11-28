@@ -43,14 +43,14 @@
 Install the package **and Recharts**, then import the stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package recharts
+npm install @chonny_iamsrithong/lab-package recharts
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
-Then import the chart parts from `lab-package` and the chart itself from `recharts`:
+Then import the chart parts from `@chonny_iamsrithong/lab-package` and the chart itself from `recharts`:
 
 ```tsx
 "use client"
@@ -63,7 +63,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 const config = {
   income: { label: "Income", color: "var(--chart-2)" },
@@ -195,7 +195,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 const config = {
   income: { label: "Income", color: "var(--chart-2)" },

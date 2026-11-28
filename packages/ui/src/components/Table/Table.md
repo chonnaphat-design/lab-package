@@ -32,11 +32,11 @@
 Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 Then import the parts you use:
@@ -51,7 +51,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 <Table>
   <TableCaption>Payments in June 2026</TableCaption>
@@ -166,7 +166,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 <Table>
   <TableCaption>Payments in June 2026</TableCaption>

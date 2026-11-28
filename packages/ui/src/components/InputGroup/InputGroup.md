@@ -55,11 +55,11 @@ TODO: decide one rule for fixed text across the product, either in the label or 
 Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 Then import the component where you use it:
@@ -72,7 +72,7 @@ import {
   InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 <InputGroup>
   <InputGroupAddon>
@@ -180,7 +180,7 @@ import {
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 <InputGroup>
   <InputGroupAddon>

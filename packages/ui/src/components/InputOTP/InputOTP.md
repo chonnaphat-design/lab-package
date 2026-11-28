@@ -46,11 +46,11 @@ InputOTP has no built-in label, hint or error message, so you add them around it
 Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 Then import the component where you use it:
@@ -59,7 +59,7 @@ Then import the component where you use it:
 "use client"
 
 import { useState } from "react"
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "lab-package"
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@chonny_iamsrithong/lab-package"
 
 export function SecurityCode() {
   const [code, setCode] = useState("")
@@ -162,7 +162,7 @@ import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 <InputOTP maxLength={6} aria-label="Verification code">
   <InputOTPGroup>

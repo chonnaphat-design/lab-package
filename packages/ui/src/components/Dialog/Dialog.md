@@ -50,11 +50,11 @@ A dialog is built from these parts, top to bottom:
 Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 Then import the component where you use it:
@@ -70,7 +70,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 <Dialog>
   <DialogTrigger render={<Button />}>Rename</DialogTrigger>
@@ -189,7 +189,7 @@ import {
   DialogTitle,
   DialogTrigger,
   Input,
-} from "lab-package"
+} from "@chonny_iamsrithong/lab-package"
 
 <Dialog>
   <DialogTrigger render={<Button />}>Transfer funds</DialogTrigger>

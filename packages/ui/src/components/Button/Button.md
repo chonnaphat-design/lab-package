@@ -31,17 +31,17 @@
 Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 Then import the component where you use it:
 
 ```tsx
-import { Button } from "lab-package"
+import { Button } from "@chonny_iamsrithong/lab-package"
 
 <Button type="submit">Save changes</Button>
 ```
@@ -181,7 +181,7 @@ Taken from the Button stories (`IconOnly`), reduced to one size:
 
 ```tsx
 import { CopyIcon } from "lucide-react"
-import { Button } from "lab-package"
+import { Button } from "@chonny_iamsrithong/lab-package"
 
 <Button iconOnly aria-label="Copy link">
   <CopyIcon />

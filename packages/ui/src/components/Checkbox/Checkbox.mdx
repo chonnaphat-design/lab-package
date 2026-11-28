@@ -38,17 +38,17 @@ import * as CheckboxStories from "./Checkbox.stories"
 ติดตั้งแพ็กเกจ แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 จากนั้นนำเข้า component ในไฟล์ที่ใช้
 
 ```tsx
-import { Checkbox } from "lab-package"
+import { Checkbox } from "@chonny_iamsrithong/lab-package"
 
 <label className="flex items-center gap-3">
   <Checkbox name="statement" />
@@ -134,7 +134,7 @@ checkbox "Select all" ติ๊กทุกตัวเลือกเมื่�
 <Canvas of={CheckboxStories.Group} />
 
 ```tsx
-import { Checkbox } from "lab-package"
+import { Checkbox } from "@chonny_iamsrithong/lab-package"
 
 <fieldset className="grid gap-3">
   <legend className="mb-1 font-medium">Which notifications do you want?</legend>

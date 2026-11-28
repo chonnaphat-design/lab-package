@@ -39,17 +39,17 @@ TODO: there is no character count component yet. If you need a limit:
 Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 Then import the component where you use it:
 
 ```tsx
-import { Textarea } from "lab-package"
+import { Textarea } from "@chonny_iamsrithong/lab-package"
 
 <label htmlFor="note">Note to recipient</label>
 <Textarea id="note" rows={5} />
@@ -124,7 +124,7 @@ Typed text takes the page's text colour.
 The `WithLabel` story, written out with its default controls:
 
 ```tsx
-import { Textarea } from "lab-package"
+import { Textarea } from "@chonny_iamsrithong/lab-package"
 
 <div className="grid gap-2">
   <label htmlFor="textarea-note" className="text-sm font-medium">

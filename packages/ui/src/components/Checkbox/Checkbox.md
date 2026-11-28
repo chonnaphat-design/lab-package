@@ -32,17 +32,17 @@ The choice applies when the form is submitted.
 Install the package, then import its stylesheet **once** at the root of your app, such as in `app/layout.tsx`:
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 Then import the component where you use it:
 
 ```tsx
-import { Checkbox } from "lab-package"
+import { Checkbox } from "@chonny_iamsrithong/lab-package"
 
 <label className="flex items-center gap-3">
   <Checkbox name="statement" />
@@ -126,7 +126,7 @@ shadcn's unticked border used `--input`, only 1.23:1 against the page. For a che
 The `Group` story:
 
 ```tsx
-import { Checkbox } from "lab-package"
+import { Checkbox } from "@chonny_iamsrithong/lab-package"
 
 <fieldset className="grid gap-3">
   <legend className="mb-1 font-medium">Which notifications do you want?</legend>

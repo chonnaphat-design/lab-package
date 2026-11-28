@@ -37,17 +37,17 @@ import * as ButtonStories from "./Button.stories"
 ติดตั้งแพ็กเกจ แล้วนำเข้า stylesheet **ครั้งเดียว** ที่ root ของแอป เช่น ใน `app/layout.tsx`
 
 ```bash
-npm install lab-package
+npm install @chonny_iamsrithong/lab-package
 ```
 
 ```tsx
-import "lab-package/styles.css"
+import "@chonny_iamsrithong/lab-package/styles.css"
 ```
 
 จากนั้นนำเข้า component ในไฟล์ที่ใช้
 
 ```tsx
-import { Button } from "lab-package"
+import { Button } from "@chonny_iamsrithong/lab-package"
 
 <Button type="submit">Save changes</Button>
 ```
@@ -189,7 +189,7 @@ TODO: ในโหมดมืด เส้นขอบอยู่ที่ 2.1
 
 ```tsx
 import { CopyIcon } from "lucide-react"
-import { Button } from "lab-package"
+import { Button } from "@chonny_iamsrithong/lab-package"
 
 <Button iconOnly aria-label="Copy link">
   <CopyIcon />
