@@ -11,4 +11,4 @@ npm run storybook                  # http://localhost:6006
 npm run build -w @chonny_iamsrithong/lab-package       # build the library
 ```
 
-Contributor and agent rules: [AGENTS.md](AGENTS.md).
+Contributor and agent rules: [AGENTS.md](AGENTS.md). Versioning and beta releases: [RELEASING.md](RELEASING.md).

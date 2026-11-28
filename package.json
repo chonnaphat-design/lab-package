@@ -9,5 +9,8 @@
     "build": "npm run build -w @chonny_iamsrithong/lab-package",
     "storybook": "npm run storybook -w @lab-package/storybook",
     "build-storybook": "npm run build-storybook -w @lab-package/storybook"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^3.1.0"
   }
 }

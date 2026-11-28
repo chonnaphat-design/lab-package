@@ -2,6 +2,7 @@
 # or develop and on every push to them. The "Check components" job is a required
 # status check in the rulesets for both branches, so a failing run blocks the merge.
 # Keep the job name in step with those rulesets: renaming it blocks every PR.
+# "Beta snapshot" runs only on pushes to develop, after "Check components" passes.
 name: CI
 
 on:
@@ -57,4 +58,86 @@ jobs:
             node .github/scripts/verify.mjs --base "origin/${{ github.base_ref }}"
           else
             node .github/scripts/verify.mjs
+          fi
+
+  # After "Check components" passes on a push to develop, packs a beta snapshot of the
+  # pending changesets (x.y.z-beta.<run number>) and uploads the .tgz as an artifact.
+  # It never publishes and never pushes: the snapshot config and version bump stay in
+  # this CI checkout. Publishing the .tgz is manual (RELEASING.md).
+  beta-snapshot:
+    name: Beta snapshot
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # No token left in .git/config, so nothing in this job can push.
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Check for pending changesets
+        id: pending
+        run: node .github/scripts/beta-snapshot.mjs pending
+
+      - name: Install dependencies
+        if: steps.pending.outputs.pending == 'true'
+        run: npm ci
+
+      - name: Set snapshot config (this checkout only)
+        if: steps.pending.outputs.pending == 'true'
+        run: node .github/scripts/beta-snapshot.mjs configure
+
+      - name: Version beta snapshot
+        if: steps.pending.outputs.pending == 'true'
+        run: npx changeset version --snapshot beta
+
+      - name: Verify beta version
+        id: version
+        if: steps.pending.outputs.pending == 'true'
+        run: node .github/scripts/beta-snapshot.mjs verify
+
+      - name: Build library
+        if: steps.pending.outputs.pending == 'true'
+        run: npm run build -w @chonny_iamsrithong/lab-package
+
+      - name: Pack
+        id: pack
+        if: steps.pending.outputs.pending == 'true'
+        run: |
+          mkdir -p "$RUNNER_TEMP/pack"
+          npm pack -w @chonny_iamsrithong/lab-package --pack-destination "$RUNNER_TEMP/pack"
+          echo "tarball=$(ls "$RUNNER_TEMP"/pack/*.tgz)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload .tgz
+        if: steps.pending.outputs.pending == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab-package-${{ steps.version.outputs.version }}
+          path: ${{ steps.pack.outputs.tarball }}
+          if-no-files-found: error
+
+      - name: Summary
+        if: always()
+        env:
+          PENDING: ${{ steps.pending.outputs.pending }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [ "$PENDING" != "true" ]; then
+            echo "No changesets pending: no beta snapshot this run." >> "$GITHUB_STEP_SUMMARY"
+          elif [ -n "$VERSION" ]; then
+            {
+              echo "Beta snapshot **$VERSION** packed and uploaded as artifact \`lab-package-$VERSION\`."
+              echo "Not published. To publish it, follow RELEASING.md."
+              echo
+              echo "Files changed in this CI checkout only (never committed):"
+              echo '```'
+              git status --short
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
