@@ -2,7 +2,7 @@
 
 `lab-package` is a public, open-source React design system published to npm. Components are shadcn/ui converted to **Base UI** primitives (`@base-ui/react`, not Radix), styled with **CSS Modules** written in Tailwind v4 `@apply` over OKLCH tokens, in TypeScript. Consumers are Next.js App Router apps. They install the package, import components, and import one precompiled stylesheet.
 
-The components were built and reviewed in the week-1-lab app and copied here. The two copies are independent, so a change in one is not reflected in the other. Test, lint and release tooling are not decided yet. Add them only when asked.
+The components were built and reviewed in the week-1-lab app and copied here. The two copies are independent, so a change in one is not reflected in the other. Versioning uses Changesets (see [Publishing](#publishing)). Test and lint tooling are not decided yet. Add them only when asked.
 
 ## Repo layout
 
@@ -24,6 +24,7 @@ npm run pack:check -w @chonny_iamsrithong/lab-package      # npm pack --dry-run:
 npm run storybook                      # dev server, http://localhost:6006
 npm run build-storybook                # static build → apps/storybook/storybook-static
 npm run typecheck -w @lab-package/storybook   # .storybook/main.ts + preview.ts
+npx changeset                          # add a changeset (see Publishing)
 ```
 
 To try the package in a real app, run `npm pack -w @chonny_iamsrithong/lab-package` and install the `.tgz` there. Avoid `npm link`: it resolves a second copy of React and breaks hooks with "Invalid hook call".
@@ -136,5 +137,7 @@ And against `packages/ui/dist/`:
 - The pack file list contains only `dist/**`, `README.md` and `package.json`.
 
 ## Publishing
+
+A change that consumers of `packages/ui` see gets a changeset (`npx changeset`) in the same pull request; a breaking change is `major`. CI's **Beta snapshot** job packs `x.y.z-beta.N` from `develop` as an artifact and never publishes or commits. [`RELEASING.md`](RELEASING.md) covers that job and the manual `npm publish --tag beta`: read it before touching `.changeset/`, the job, or a release.
 
 Publishing is the maintainer's call (planned for Week 4). Agents get the release ready and stop at `npm run pack:check -w @chonny_iamsrithong/lab-package`.
