@@ -10,7 +10,7 @@ An npm workspace. Run every command from the repo root.
 
 - `packages/ui/`: the published library, npm name `lab-package`. Its `package.json`, `vite.config.ts` and `README.md` (the npm page) live here.
 - `apps/storybook/`: private Storybook 10 workspace (`@lab-package/storybook`) for checking props and states. It holds config only. Stories live beside the components.
-- Root `package.json`: private (`lab-package-workspace`). It holds the `workspaces` list and the `storybook` / `build-storybook` scripts.
+- Root `package.json`: private (`lab-package-workspace`). It holds the `workspaces` list and the `build` / `storybook` / `build-storybook` scripts.
 
 ## Commands
 
@@ -18,7 +18,7 @@ An npm workspace. Run every command from the repo root.
 
 ```bash
 npm install                            # all workspaces
-npm run build -w lab-package           # vite build → packages/ui/dist/
+npm run build                          # same as: npm run build -w lab-package (vite build → packages/ui/dist/)
 npm run typecheck -w lab-package       # tsc --noEmit (components and stories)
 npm run pack:check -w lab-package      # npm pack --dry-run: the exact publish file list
 npm run storybook                      # dev server, http://localhost:6006
